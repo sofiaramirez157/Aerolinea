@@ -2,11 +2,16 @@ package com.example.Aerolinea.model;
 
 
 import jakarta.persistence.*;
+import lombok.Getter;
+import lombok.Setter;
 
+@Setter
+@Getter
 @Entity
 @Table(name = "Destination")
 
 public class Destination {
+
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
 
@@ -18,4 +23,6 @@ public class Destination {
 
     @Column(name = "country")
     private String country;
+
 }
+
