@@ -1,4 +1,4 @@
 package com.example.Aerolinea.integrationTest.controller;
 
-public class GAH {
+public class DestinationControllerIntegrationTest {
 }
