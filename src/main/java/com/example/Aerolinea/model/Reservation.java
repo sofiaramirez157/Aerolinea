@@ -1,7 +1,6 @@
 package com.example.Aerolinea.model;
 
 import jakarta.persistence.*;
-import lombok.Generated;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
