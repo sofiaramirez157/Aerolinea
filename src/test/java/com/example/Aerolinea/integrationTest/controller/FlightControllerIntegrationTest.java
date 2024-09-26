@@ -71,7 +71,7 @@ public class FlightControllerIntegrationTest {
         .andExpect(content().contentType("application/json"))
         .andExpect(jsonPath("$.id").value(1))
         .andExpect(jsonPath("$.origin").value("Madrid"))
-        .andExpect(jsonPath("$.departuretime").value("8:15"))
+        .andExpect(jsonPath("$.departuretime").value("08:15"))
         .andExpect(jsonPath("$.arrivaltime").value("10:20"))
         .andExpect(jsonPath("$.availableseats").value(60))
         .andExpect(jsonPath("$.status").value(true));
