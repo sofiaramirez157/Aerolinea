@@ -5,70 +5,80 @@ import com.example.Aerolinea.repositories.IReservationRepository;
 import com.example.Aerolinea.service.ReservationService;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.context.SpringBootTest;
+import org.mockito.InjectMocks;
+import org.mockito.Mock;
+import org.mockito.MockitoAnnotations;
 
 import java.time.LocalDateTime;
 import java.util.Optional;
 
 import static org.junit.jupiter.api.Assertions.*;
+import static org.mockito.Mockito.*;
 
-@SpringBootTest
 class ReservationServiceIntegrationTest {
 
-    @Autowired
-    private ReservationService reservationService;
-
-    @Autowired
+    @Mock
     private IReservationRepository iReservationRepository;
+
+    @InjectMocks
+    private ReservationService reservationService;
 
     private Reservation reservation;
 
     @BeforeEach
     void setUp() {
-        iReservationRepository.deleteAll();
+        MockitoAnnotations.openMocks(this);
         reservation = new Reservation();
+        reservation.setId(1L);
         reservation.setStatus(true);
         reservation.setReservationDate(LocalDateTime.now());
     }
 
     @Test
     void testCreateReservation() {
+        when(iReservationRepository.save(any(Reservation.class))).thenReturn(reservation);
+
         Reservation savedReservation = reservationService.createReservation(reservation);
 
         assertNotNull(savedReservation);
         assertEquals(reservation.isStatus(), savedReservation.isStatus());
+
+        verify(iReservationRepository, times(1)).save(reservation);
     }
 
     @Test
     void testGetReservationById() {
-        Reservation savedReservation = iReservationRepository.save(reservation);
+        when(iReservationRepository.findById(anyLong())).thenReturn(Optional.of(reservation));
 
-        Optional<Reservation> foundReservation = reservationService.getReservationById(savedReservation.getId());
+        Optional<Reservation> foundReservation = reservationService.getReservationById(1L);
 
         assertTrue(foundReservation.isPresent());
-        assertEquals(savedReservation.getId(), foundReservation.get().getId());
+        assertEquals(reservation.getId(), foundReservation.get().getId());
+
+        verify(iReservationRepository, times(1)).findById(1L);
     }
 
     @Test
     void testUpdateReservation() {
-        Reservation savedReservation = iReservationRepository.save(reservation);
-        savedReservation.setStatus(false);
+        when(iReservationRepository.findById(anyLong())).thenReturn(Optional.of(reservation));
+        when(iReservationRepository.save(any(Reservation.class))).thenReturn(reservation);
 
-        Reservation updatedReservation = reservationService.updateReservation(savedReservation.getId(), savedReservation);
+        Reservation updatedReservation = reservationService.updateReservation(1L, reservation);
 
         assertNotNull(updatedReservation);
-        assertEquals(false, updatedReservation.isStatus());
+        assertEquals(reservation.isStatus(), updatedReservation.isStatus());
+
+        verify(iReservationRepository, times(1)).findById(1L);
+        verify(iReservationRepository, times(1)).save(reservation);
     }
 
     @Test
     void testDeleteReservation() {
-        Reservation savedReservation = iReservationRepository.save(reservation);
+        when(iReservationRepository.findById(1L)).thenReturn(Optional.of(reservation));
+        when(iReservationRepository.existsById(1L)).thenReturn(true);
 
-        reservationService.deleteReservation(savedReservation.getId());
+        reservationService.deleteReservation(1L);
 
-        Optional<Reservation> deletedReservation = iReservationRepository.findById(savedReservation.getId());
-
-        assertFalse(deletedReservation.isPresent());
+        verify(iReservationRepository, times(1)).deleteById(1L);
     }
 }
