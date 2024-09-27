@@ -32,9 +32,9 @@ public class DestinationService {
         }
     }
 
-    public void updateDestination(Destination destination, long id) {
+    public Destination updateDestination(Destination destination, long id) {
         destination.setId(id);
-        iDestinationRepository.save(destination);
+       return iDestinationRepository.save(destination);
     }
 
     public boolean deleteDestination(long id) {

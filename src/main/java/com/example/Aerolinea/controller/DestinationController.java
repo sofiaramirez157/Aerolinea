@@ -30,8 +30,8 @@ public class DestinationController {
     }
 
     @PutMapping(path = "/{id}")
-    public void updateDestination(@RequestBody Destination destination, @PathVariable long id){
-        destinationService.updateDestination(destination, id);
+    public Destination updateDestination(@RequestBody Destination destination, @PathVariable long id){
+        return destinationService.updateDestination(destination, id);
     }
 
     @DeleteMapping(path = "/{id}")

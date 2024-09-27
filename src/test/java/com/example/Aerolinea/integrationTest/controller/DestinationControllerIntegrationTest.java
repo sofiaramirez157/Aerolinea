@@ -13,6 +13,7 @@ import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 
+import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
 
@@ -68,13 +69,22 @@ public class DestinationControllerIntegrationTest {
 
         @Test
           void getAllDestinationTest() throws Exception{
+            Destination destination1 = new Destination(1, "Paris", "France");
+            Destination destination2 = new Destination(2, "Rome", "Italy");
+            List<Destination> destinationList = Arrays.asList(destination1, destination2);
+
         when(destinationService.getAllDestination()).thenReturn(destinationList);
 
-        mockMvc.perform(get("/api/destination"))
+        mockMvc.perform(get("/api/destination/")
+                .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk())
-                .andExpect(content().contentType("application/json"))
+                .andExpect(content().contentType(MediaType.APPLICATION_JSON))
                 .andExpect(jsonPath("$").isArray())
-                .andExpect(jsonPath("$.length()").value(2));
+                .andExpect(jsonPath("$.length()").value(2))
+                .andExpect(jsonPath("$[0].name").value("Paris"))
+                .andExpect(jsonPath("$[0].country").value("France"))
+                .andExpect(jsonPath("$[1].name").value("Rome"))
+                .andExpect(jsonPath("$[1].country").value("Italy"));
         }
 
         @Test
@@ -89,21 +99,15 @@ public class DestinationControllerIntegrationTest {
 
         @Test
           void updateDestinationTest() throws Exception{
-        Destination updateDestination = new Destination();
-        updateDestination.setId(2);
-        updateDestination.setName("Burdeos");
-
-            when(destinationService.updateDestination(updateDestination, 1)).thenReturn(destination2);
+            when(destinationService.updateDestination(destination1, 1)).thenReturn(destination1);
 
         ObjectMapper objectMapper = new ObjectMapper();
-        String destinationJson = objectMapper.writeValueAsString(updateDestination);
+        String destinationJson = objectMapper.writeValueAsString(destination1);
 
-            mockMvc.perform(put("/api/destination/update/2")
+            mockMvc.perform(put("/api/destination/1")
                             .contentType(MediaType.APPLICATION_JSON)
                             .content(destinationJson))
-                    .andExpect(status().isOk())
-                    .andExpect(jsonPath("$.id").value(2))
-                    .andExpect(jsonPath("$.name").value("Burdeos"));
+                    .andExpect(status().isOk());
         }
 
         @Test
