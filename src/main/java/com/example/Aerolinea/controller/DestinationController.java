@@ -38,9 +38,9 @@ public class DestinationController {
     public String deleteDestinationById(@PathVariable long id){
         boolean ok = destinationService.deleteDestination(id);
         if (ok){
-            return "Destination with id" + id + "was delete";
+            return "Destination with id " + id + " was delete";
         } else {
-            return "Destination with id" + id + "not found";
+            return "Destination with id " + id + " not found";
         }
     }
 }
