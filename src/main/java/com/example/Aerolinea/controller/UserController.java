@@ -1,47 +1,46 @@
-package com.example.Aerolinea.controller;
+Package com.example.Aerolinea.controller;
 
 import com.example.Aerolinea.model.User;
 import com.example.Aerolinea.service.UserService;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.List;
 import java.util.Optional;
 
 @RestController
 @RequestMapping("/api/user")
 @CrossOrigin
-
 public class UserController {
-    UserService userService;
 
-    @PostMapping(path = "/")
-    public User createUser(@RequestBody User user){
-        return userService.createService(user);
+    private final UserService userService;
+
+    public UserController(UserService userService) {
+        this.userService = userService;
     }
 
-    @GetMapping(path = "/")
-    public List<User> getAllUser(){
-        return userService.getAlluser();
+    @PostMapping("/")
+    public User createUser(@RequestBody User user) {
+        return userService.createUser(user);
     }
 
-    @GetMapping(path = "/{id}")
-    public Optional<User> getUserId(@PathVariable long id){
+    @GetMapping("/{id}")
+    public Optional<User> getUserById(@PathVariable Long id) {
         return userService.getUserById(id);
     }
 
-    @PutMapping(path = "/{id}")
-    public void updateUser(@RequestBody User user, @PathVariable long id){
-        userService.updateUser(User, id);
+    @PutMapping("/{id}")
+    public void updateUser(@RequestBody User user, @PathVariable Long id) {
+        userService.updateUser(user, id);
     }
 
-    @DeleteMapping(path = "/{id}")
-    public String deleteUserById(@PathVariable long id){
+    @DeleteMapping("/{id}")
+    public String deleteUser(@PathVariable Long id) {
         boolean ok = userService.deleteUser(id);
-        if (ok){
-            return "User with id" + id + "was delete";
+        if (ok) {
+            return "User with id " + id + " was deleted.";
         } else {
-            return "User with id" + id + "not found";
+            return "User with id " + id + " not found.";
         }
     }
 }
+
 
