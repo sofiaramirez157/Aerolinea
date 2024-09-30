@@ -28,7 +28,7 @@ public class DestinationServiceIntegrationTest {
     private Destination destination2;
 
     @BeforeEach
-    public void Setup(){
+    public void setUp(){
         MockitoAnnotations.openMocks(this);
         destination1 = new Destination();
         destination1.setId(1);
