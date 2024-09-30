@@ -1,5 +1,6 @@
 package com.example.Aerolinea.service;
 
+import com.example.Aerolinea.exceptions.ResourceNotFoundException;
 import com.example.Aerolinea.model.User;
 import com.example.Aerolinea.repositories.IUserRepository;
 import org.springframework.stereotype.Service;
@@ -20,32 +21,26 @@ public class UserService {
     }
 
     public List<User> getAllUsers() {
-        try {
-            return userRepository.findAll();
-        } catch (Exception e) {
-            throw new RuntimeException("Error retrieving users.", e);
-        }
+        return userRepository.findAll();
     }
 
     public Optional<User> getUserById(long id) {
-        try {
-            return userRepository.findById(id);
-        } catch (Exception e) {
-            throw new RuntimeException("Error retrieving user details.", e);
-        }
+        return userRepository.findById(id);
     }
 
-    public void updateUser(User user, long id) {
+    public Optional<User> updateUser(User user, long id) {
+        if (!userRepository.existsById(id)) {
+            throw new ResourceNotFoundException("User not found with id: " + id);
+        }
         user.setId(id);
-        userRepository.save(user);
+        return Optional.of(userRepository.save(user));
     }
 
     public boolean deleteUser(long id) {
-        try {
-            userRepository.deleteById(id);
-            return true;
-        } catch (Exception e) {
-            return false;
+        if (!userRepository.existsById(id)) {
+            throw new ResourceNotFoundException("User not found with id: " + id);
         }
+        userRepository.deleteById(id);
+        return true;
     }
 }

@@ -1,8 +1,8 @@
 package com.example.Aerolinea.service;
 
+import com.example.Aerolinea.exceptions.ResourceNotFoundException;
 import com.example.Aerolinea.model.Destination;
 import com.example.Aerolinea.repositories.IDestinationRepository;
-import jakarta.persistence.Id;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -10,39 +10,37 @@ import java.util.Optional;
 
 @Service
 public class DestinationService {
-    private IDestinationRepository iDestinationRepository;
+    private final IDestinationRepository destinationRepository;
+
+    public DestinationService(IDestinationRepository destinationRepository) {
+        this.destinationRepository = destinationRepository;
+    }
 
     public Destination createDestination(Destination destination) {
-        return iDestinationRepository.save(destination);
+        return destinationRepository.save(destination);
     }
 
     public List<Destination> getAllDestination() {
-        try {
-            return iDestinationRepository.findAll();
-        } catch (Exception e) {
-            throw new RuntimeException("Error retrieving destination.", e);
-        }
+        return destinationRepository.findAll();
     }
 
     public Optional<Destination> getDestinationById(long id) {
-        try {
-            return iDestinationRepository.findById(id);
-        } catch (Exception e) {
-            throw new RuntimeException("Error retrieving destination details.", e);
-        }
+        return destinationRepository.findById(id);
     }
 
-    public void updateDestination(Destination destination, long id) {
+    public Optional<Destination> updateDestination(Destination destination, long id) {
+        if (!destinationRepository.existsById(id)) {
+            throw new ResourceNotFoundException("Destination not found with id: " + id);
+        }
         destination.setId(id);
-        iDestinationRepository.save(destination);
+        return Optional.of(destinationRepository.save(destination));
     }
 
     public boolean deleteDestination(long id) {
-        try {
-            iDestinationRepository.deleteById(id);
-            return true;
-        } catch (Exception e) {
-            return false;
+        if (!destinationRepository.existsById(id)) {
+            throw new ResourceNotFoundException("Destination not found with id: " + id);
         }
+        destinationRepository.deleteById(id);
+        return true;
     }
 }
