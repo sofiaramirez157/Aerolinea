@@ -2,7 +2,6 @@ package com.example.Aerolinea.service;
 
 import com.example.Aerolinea.model.User;
 import com.example.Aerolinea.repositories.IUserRepository;
-import jakarta.persistence.Id;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -10,36 +9,40 @@ import java.util.Optional;
 
 @Service
 public class UserService {
-    private IUserRepository iUserRepository;
+    private final IUserRepository userRepository;
 
-    public User createUser(User user) {
-        return iUserRepository.save(user);
+    public UserService(IUserRepository userRepository) {
+        this.userRepository = userRepository;
     }
 
-    public List<User> getAllUser() {
+    public User createUser(User user) {
+        return userRepository.save(user);
+    }
+
+    public List<User> getAllUsers() {
         try {
-            return iUserRepository.findAll();
+            return userRepository.findAll();
         } catch (Exception e) {
-            throw new RuntimeException("Error retrieving user.", e);
+            throw new RuntimeException("Error retrieving users.", e);
         }
     }
 
     public Optional<User> getUserById(long id) {
         try {
-            return i.findById(id);
+            return userRepository.findById(id);
         } catch (Exception e) {
             throw new RuntimeException("Error retrieving user details.", e);
         }
     }
 
     public void updateUser(User user, long id) {
-        User.setId(id);
-        iUserRepository.save(user);
+        user.setId(id);
+        userRepository.save(user);
     }
 
     public boolean deleteUser(long id) {
         try {
-            iUserRepository.deleteById(id);
+            userRepository.deleteById(id);
             return true;
         } catch (Exception e) {
             return false;

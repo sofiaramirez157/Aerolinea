@@ -1,31 +1,26 @@
 package com.example.Aerolinea.model;
 
-
 import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.Setter;
 
-@Setter
 @Getter
+@Setter
 @Entity
-@Table(name = "User")
-
+@Table(name = "users")
 public class User {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private Long id;
 
-    @Column(name = "id")
-    private long id;
-
-    @Column(name = "username")
+    @Column(name = "username", nullable = false, unique = true)
     private String username;
 
-    @Column(name = "password")
+    @Column(name = "password", nullable = false)
     private String password;
 
-    @Column(name = "role"
-            private String role;
-
+    @Enumerated(EnumType.STRING)
+    @Column(name = "role", nullable = false)
+    private ERole role;
 }
-

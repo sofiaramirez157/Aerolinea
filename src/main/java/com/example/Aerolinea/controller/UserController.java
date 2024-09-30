@@ -10,38 +10,40 @@ import java.util.Optional;
 @RestController
 @RequestMapping("/api/user")
 @CrossOrigin
-
 public class UserController {
-    UserService userService;
+    private final UserService userService;
 
-    @PostMapping(path = "/")
-    public User createUser(@RequestBody User user){
-        return userService.createService(user);
+    public UserController(UserService userService) {
+        this.userService = userService;
     }
 
-    @GetMapping(path = "/")
-    public List<User> getAllUser(){
-        return userService.getAlluser();
+    @PostMapping("/")
+    public User createUser(@RequestBody User user) {
+        return userService.createUser(user);
     }
 
-    @GetMapping(path = "/{id}")
-    public Optional<User> getUserId(@PathVariable long id){
+    @GetMapping("/")
+    public List<User> getAllUsers() {
+        return userService.getAllUsers();
+    }
+
+    @GetMapping("/{id}")
+    public Optional<User> getUserById(@PathVariable long id) {
         return userService.getUserById(id);
     }
 
-    @PutMapping(path = "/{id}")
-    public void updateUser(@RequestBody User user, @PathVariable long id){
-        userService.updateUser(User, id);
+    @PutMapping("/{id}")
+    public void updateUser(@RequestBody User user, @PathVariable long id) {
+        userService.updateUser(user, id);
     }
 
-    @DeleteMapping(path = "/{id}")
-    public String deleteUserById(@PathVariable long id){
+    @DeleteMapping("/{id}")
+    public String deleteUserById(@PathVariable long id) {
         boolean ok = userService.deleteUser(id);
-        if (ok){
-            return "User with id" + id + "was delete";
+        if (ok) {
+            return "User with id " + id + " was deleted.";
         } else {
-            return "User with id" + id + "not found";
+            return "User with id " + id + " not found.";
         }
     }
 }
-
