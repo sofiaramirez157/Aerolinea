@@ -2,47 +2,43 @@ package com.example.Aerolinea.controller;
 
 import com.example.Aerolinea.model.Flight;
 import com.example.Aerolinea.service.FlightService;
-
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
+
 import java.util.List;
-import java.util.Optional;
 
 @RestController
 @RequestMapping("/api/flight")
 @CrossOrigin
-
 public class FlightController {
-    @Autowired
-    FlightService flightService;
+    private final FlightService flightService;
 
-    @PostMapping(path = "post")
+    public FlightController(FlightService flightService) {
+        this.flightService = flightService;
+    }
+
+    @PostMapping("/")
     public Flight createFlight(@RequestBody Flight flight) {
         return flightService.createFlight(flight);
     }
 
-    @GetMapping(path = "get")
+    @GetMapping("/")
     public List<Flight> getAllFlight() {
         return flightService.getAllFlight();
     }
 
-    @GetMapping(path = "get/{id}")
-    public Optional<Flight> getFlightById(@PathVariable long id) {
+    @GetMapping("/{id}")
+    public Flight getFlightById(@PathVariable long id) {
         return flightService.getFlightById(id);
     }
 
-    @PutMapping(path = "put/{id}")
+    @PutMapping("/{id}")
     public void updateFlight(@RequestBody Flight flight, @PathVariable long id) {
         flightService.updateFlight(flight, id);
     }
 
-    @DeleteMapping(path = "delete/{id}")
+    @DeleteMapping("/{id}")
     public String deleteFlightById(@PathVariable long id) {
-        boolean ok = flightService.deleteFlight(id);
-        if (ok) {
-            return "Flight with id" + id + "was deleted";
-        } else {
-            return "Destination with id" + id + "not found";
-        }
+        flightService.deleteFlight(id);
+        return "Flight with ID " + id + " was deleted.";
     }
 }

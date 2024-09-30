@@ -3,6 +3,8 @@ package com.example.Aerolinea.unitTest.exceptions;
 import static org.junit.jupiter.api.Assertions.*;
 
 import com.example.Aerolinea.exceptions.*;
+import com.example.Aerolinea.exceptions.GlobalExceptionHandler;
+import com.example.Aerolinea.exceptions.ErrorResponse;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.http.HttpStatus;
@@ -66,7 +68,6 @@ public class ExceptionHandlingTests {
         assertEquals(message, exception.getMessage());
     }
 
-    // DON'T FORGET FROM HERE THERE'S THE GLOBAL ONES -- YOOHOO YOOHOO A GREAT PIRATE I AM
     @Test
     public void shouldHandleResourceNotFoundException() {
         String message = "Resource not found";
@@ -74,7 +75,8 @@ public class ExceptionHandlingTests {
 
         ResponseEntity<ErrorResponse> response = globalExceptionHandler.handleResourceNotFoundException(exception);
 
-        assertEquals(HttpStatus.NOT_FOUND.value(), response.getStatusCodeValue());
+        assertEquals(HttpStatus.NOT_FOUND, response.getStatusCode());
+        assertNotNull(response.getBody(), "ErrorResponse should not be null");
         assertEquals(message, response.getBody().getMessage());
     }
 
@@ -85,7 +87,8 @@ public class ExceptionHandlingTests {
 
         ResponseEntity<ErrorResponse> response = globalExceptionHandler.handleInvalidRequestException(exception);
 
-        assertEquals(HttpStatus.BAD_REQUEST.value(), response.getStatusCodeValue());
+        assertEquals(HttpStatus.BAD_REQUEST, response.getStatusCode());
+        assertNotNull(response.getBody(), "ErrorResponse should not be null");
         assertEquals(message, response.getBody().getMessage());
     }
 
@@ -96,7 +99,8 @@ public class ExceptionHandlingTests {
 
         ResponseEntity<ErrorResponse> response = globalExceptionHandler.handleFlightNotAvailableException(exception);
 
-        assertEquals(HttpStatus.NOT_FOUND.value(), response.getStatusCodeValue());
+        assertEquals(HttpStatus.NOT_FOUND, response.getStatusCode());
+        assertNotNull(response.getBody(), "ErrorResponse should not be null");
         assertEquals(message, response.getBody().getMessage());
     }
 
@@ -107,7 +111,8 @@ public class ExceptionHandlingTests {
 
         ResponseEntity<ErrorResponse> response = globalExceptionHandler.handleUserNotFoundException(exception);
 
-        assertEquals(HttpStatus.NOT_FOUND.value(), response.getStatusCodeValue());
+        assertEquals(HttpStatus.NOT_FOUND, response.getStatusCode());
+        assertNotNull(response.getBody(), "ErrorResponse should not be null");
         assertEquals(message, response.getBody().getMessage());
     }
 
@@ -118,7 +123,8 @@ public class ExceptionHandlingTests {
 
         ResponseEntity<ErrorResponse> response = globalExceptionHandler.handleReservationNotFoundException(exception);
 
-        assertEquals(HttpStatus.NOT_FOUND.value(), response.getStatusCodeValue());
+        assertEquals(HttpStatus.NOT_FOUND, response.getStatusCode());
+        assertNotNull(response.getBody(), "ErrorResponse should not be null");
         assertEquals(message, response.getBody().getMessage());
     }
 
@@ -129,7 +135,8 @@ public class ExceptionHandlingTests {
 
         ResponseEntity<ErrorResponse> response = globalExceptionHandler.handleDestinationNotFoundException(exception);
 
-        assertEquals(HttpStatus.NOT_FOUND.value(), response.getStatusCodeValue());
+        assertEquals(HttpStatus.NOT_FOUND, response.getStatusCode());
+        assertNotNull(response.getBody(), "ErrorResponse should not be null");
         assertEquals(message, response.getBody().getMessage());
     }
 
@@ -140,7 +147,8 @@ public class ExceptionHandlingTests {
 
         ResponseEntity<ErrorResponse> response = globalExceptionHandler.handleUnauthorizedAccessException(exception);
 
-        assertEquals(HttpStatus.FORBIDDEN.value(), response.getStatusCodeValue());
+        assertEquals(HttpStatus.FORBIDDEN, response.getStatusCode());
+        assertNotNull(response.getBody(), "ErrorResponse should not be null");
         assertEquals(message, response.getBody().getMessage());
     }
 
@@ -150,7 +158,8 @@ public class ExceptionHandlingTests {
 
         ResponseEntity<ErrorResponse> response = globalExceptionHandler.handleGenericException(exception);
 
-        assertEquals(HttpStatus.INTERNAL_SERVER_ERROR.value(), response.getStatusCodeValue());
+        assertEquals(HttpStatus.INTERNAL_SERVER_ERROR, response.getStatusCode());
+        assertNotNull(response.getBody(), "ErrorResponse should not be null");
         assertEquals("An unexpected error occurred.", response.getBody().getMessage());
     }
 }

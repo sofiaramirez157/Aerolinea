@@ -1,12 +1,14 @@
 package com.example.Aerolinea.service;
 
-import com.example.Aerolinea.exceptions.ResourceNotFoundException;
 import com.example.Aerolinea.model.User;
 import com.example.Aerolinea.repositories.IUserRepository;
+import com.example.Aerolinea.exceptions.UserNotFoundException;
+import com.example.Aerolinea.exceptions.InvalidRequestException;
+import com.example.Aerolinea.exceptions.UnauthorizedAccessException;
+
 import org.springframework.stereotype.Service;
 
 import java.util.List;
-import java.util.Optional;
 
 @Service
 public class UserService {
@@ -17,6 +19,7 @@ public class UserService {
     }
 
     public User createUser(User user) {
+        validateUser(user);
         return userRepository.save(user);
     }
 
@@ -24,23 +27,34 @@ public class UserService {
         return userRepository.findAll();
     }
 
-    public Optional<User> getUserById(long id) {
-        return userRepository.findById(id);
+    public User getUserById(long id) {
+        return userRepository.findById(id)
+                .orElseThrow(() -> new UserNotFoundException("User not found with ID: " + id));
     }
 
-    public Optional<User> updateUser(User user, long id) {
-        if (!userRepository.existsById(id)) {
-            throw new ResourceNotFoundException("User not found with id: " + id);
-        }
+    public void updateUser(User user, long id) {
+        getUserById(id);
+        validateUser(user);
         user.setId(id);
-        return Optional.of(userRepository.save(user));
+        userRepository.save(user);
     }
 
-    public boolean deleteUser(long id) {
+    public void deleteUser(long id) {
         if (!userRepository.existsById(id)) {
-            throw new ResourceNotFoundException("User not found with id: " + id);
+            throw new UserNotFoundException("User not found with ID: " + id);
         }
         userRepository.deleteById(id);
-        return true;
+    }
+
+    public void checkAccess(long userId, long currentUserId) {
+        if (userId != currentUserId) {
+            throw new UnauthorizedAccessException("You are not authorized to access this user's data.");
+        }
+    }
+
+    private void validateUser(User user) {
+        if (user == null || user.getUsername() == null || user.getPassword() == null) {
+            throw new InvalidRequestException("Invalid user data provided.");
+        }
     }
 }

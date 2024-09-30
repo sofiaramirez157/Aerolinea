@@ -1,6 +1,5 @@
 package com.example.Aerolinea.controller;
 
-import com.example.Aerolinea.exceptions.ResourceNotFoundException;
 import com.example.Aerolinea.model.Destination;
 import com.example.Aerolinea.service.DestinationService;
 import org.springframework.web.bind.annotation.*;
@@ -29,23 +28,21 @@ public class DestinationController {
 
     @GetMapping(path = "/{id}")
     public Destination getDestinationById(@PathVariable long id) {
-        return destinationService.getDestinationById(id)
-                .orElseThrow(() -> new ResourceNotFoundException("Destination not found with id: " + id));
+        return destinationService.getDestinationById(id);
     }
 
     @PutMapping(path = "/{id}")
-    public Destination updateDestination(@RequestBody Destination destination, @PathVariable long id) {
-        return destinationService.updateDestination(destination, id)
-                .orElseThrow(() -> new ResourceNotFoundException("Destination not found with id: " + id));
+    public void updateDestination(@RequestBody Destination destination, @PathVariable long id) {
+        destinationService.updateDestination(destination, id);
     }
 
     @DeleteMapping(path = "/{id}")
     public String deleteDestinationById(@PathVariable long id) {
         boolean ok = destinationService.deleteDestination(id);
         if (ok) {
-            return "Destination with id " + id + " was deleted.";
+            return "Destination with id " + id + " was deleted";
         } else {
-            throw new ResourceNotFoundException("Destination with id " + id + " not found.");
+            return "Destination with id " + id + " not found";
         }
     }
 }

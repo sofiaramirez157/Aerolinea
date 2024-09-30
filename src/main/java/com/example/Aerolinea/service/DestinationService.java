@@ -1,46 +1,64 @@
 package com.example.Aerolinea.service;
 
-import com.example.Aerolinea.exceptions.ResourceNotFoundException;
 import com.example.Aerolinea.model.Destination;
 import com.example.Aerolinea.repositories.IDestinationRepository;
+import com.example.Aerolinea.exceptions.DestinationNotFoundException;
+import com.example.Aerolinea.exceptions.InvalidRequestException;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
-import java.util.Optional;
 
 @Service
 public class DestinationService {
-    private final IDestinationRepository destinationRepository;
+    private final IDestinationRepository iDestinationRepository;
 
-    public DestinationService(IDestinationRepository destinationRepository) {
-        this.destinationRepository = destinationRepository;
+    public DestinationService(IDestinationRepository iDestinationRepository) {
+        this.iDestinationRepository = iDestinationRepository;
     }
 
     public Destination createDestination(Destination destination) {
-        return destinationRepository.save(destination);
+        if (destination == null || destination.getName() == null || destination.getCountry() == null) {
+            throw new InvalidRequestException("Invalid destination data provided.");
+        }
+        return iDestinationRepository.save(destination);
     }
 
     public List<Destination> getAllDestination() {
-        return destinationRepository.findAll();
-    }
-
-    public Optional<Destination> getDestinationById(long id) {
-        return destinationRepository.findById(id);
-    }
-
-    public Optional<Destination> updateDestination(Destination destination, long id) {
-        if (!destinationRepository.existsById(id)) {
-            throw new ResourceNotFoundException("Destination not found with id: " + id);
+        try {
+            return iDestinationRepository.findAll();
+        } catch (Exception e) {
+            throw new RuntimeException("Error retrieving destinations.", e);
         }
+    }
+
+    public Destination getDestinationById(long id) {
+        return iDestinationRepository.findById(id)
+                .orElseThrow(() -> new DestinationNotFoundException("Destination not found with ID: " + id));
+    }
+
+    public void updateDestination(Destination destination, long id) {
+        if (!iDestinationRepository.existsById(id)) {
+            throw new DestinationNotFoundException("Destination not found with ID: " + id);
+        }
+
+        if (destination.getName() == null || destination.getCountry() == null) {
+            throw new InvalidRequestException("Invalid destination data provided.");
+        }
+
         destination.setId(id);
-        return Optional.of(destinationRepository.save(destination));
+        iDestinationRepository.save(destination);
     }
 
     public boolean deleteDestination(long id) {
-        if (!destinationRepository.existsById(id)) {
-            throw new ResourceNotFoundException("Destination not found with id: " + id);
+        if (!iDestinationRepository.existsById(id)) {
+            throw new DestinationNotFoundException("Destination not found with ID: " + id);
         }
-        destinationRepository.deleteById(id);
-        return true;
+
+        try {
+            iDestinationRepository.deleteById(id);
+            return true;
+        } catch (Exception e) {
+            throw new RuntimeException("Error deleting destination.", e);
+        }
     }
 }

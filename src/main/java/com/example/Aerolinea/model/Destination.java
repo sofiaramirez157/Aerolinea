@@ -25,4 +25,3 @@ public class Destination {
     private String country;
 
 }
-
