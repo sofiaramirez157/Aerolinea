@@ -4,6 +4,9 @@ package com.example.Aerolinea.integrationTest.controller;
 import com.example.Aerolinea.controller.FlightController;
 import com.example.Aerolinea.model.Flight;
 import com.example.Aerolinea.service.FlightService;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
+
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.mockito.ArgumentMatchers.any;
@@ -66,15 +69,72 @@ public class FlightControllerIntegrationTest {
     @Test
     void createFlight() throws Exception {
         when(flightService.createFlight(any(Flight.class))).thenReturn(flight1);
-        mockMvc.perform(post("/api/flight/post"))
+
+        ObjectMapper objectMapper = new ObjectMapper();
+        objectMapper.registerModule(new JavaTimeModule());
+        String flightJson = objectMapper.writeValueAsString(flight1);
+
+        mockMvc.perform(post("/api/flight/post")
+            .contentType("application/json")
+            .content(flightJson))
+            .andExpect(status().isOk())
+            .andExpect(jsonPath("$.id").value(1))
+            .andExpect(jsonPath("$.origin").value("Madrid"))
+            .andExpect(jsonPath("$.departureTime").value("08:15"))
+            .andExpect(jsonPath("$.arrivalTime").value("10:20"))
+            .andExpect(jsonPath("$.availableSeats").value(60))
+            .andExpect(jsonPath("$.status").value(true));
+    }
+
+    @Test
+    void getAllFlight() throws Exception {
+        when(flightService.getAllFlight()).thenReturn(flightList);
+        mockMvc.perform(get("/api/flight/get"))
         .andExpect(status().isOk())
         .andExpect(content().contentType("application/json"))
-        .andExpect(jsonPath("$.id").value(1))
-        .andExpect(jsonPath("$.origin").value("Madrid"))
-        .andExpect(jsonPath("$.departuretime").value("08:15"))
-        .andExpect(jsonPath("$.arrivaltime").value("10:20"))
-        .andExpect(jsonPath("$.availableseats").value(60))
-        .andExpect(jsonPath("$.status").value(true));
+        .andExpect(jsonPath("$[0].id").value(1))
+            .andExpect(jsonPath("$[0].origin").value("Madrid"))
+            .andExpect(jsonPath("$[0].departureTime").value("08:15"))
+            .andExpect(jsonPath("$[0].arrivalTime").value("10:20"))
+            .andExpect(jsonPath("$[0].availableSeats").value(60))
+            .andExpect(jsonPath("$[0].status").value(true))
+            .andExpect(jsonPath("$.id").value(2))
+            .andExpect(jsonPath("$.origin").value("Scotland"))
+            .andExpect(jsonPath("$.departureTime").value("15:00"))
+            .andExpect(jsonPath("$.arrivalTime").value("20:35"))
+            .andExpect(jsonPath("$.availableSeats").value(0))
+            .andExpect(jsonPath("$.status").value(false));
+    }
+
+    @Test
+    void getFlightById() throws Exception {
+        when(flightService.getFlightById(2)).thenReturn(Optional.of(flight2));
+        mockMvc.perform(get("/api/flight/get/2"))
+        .andExpect(status().isOk())
+        .andExpect(content().contentType("application/json"))
+        .andExpect(jsonPath("$.id").value(2))
+        .andExpect(jsonPath("$.origin").value("Scotland"))
+        .andExpect(jsonPath("$.departureTime").value("15:00"))
+        .andExpect(jsonPath("$.arrivalTime").value("20:35"))
+        .andExpect(jsonPath("$.availableSeats").value(0))
+        .andExpect(jsonPath("$.status").value(false));
+    }
+
+    @Test
+    void updateFlight() throws Exception {
+        Flight updateFlight = new Flight();
+        updateFlight.setId(1);
+        updateFlight.setOrigin("Madrid");
+        updateFlight.setDepartureTime(LocalTime.of(8, 15));
+        updateFlight.setArrivalTime(LocalTime.of(11, 00));
+        updateFlight.setAvailableSeats(35);
+        updateFlight.setStatus(true);
+
+        mockMvc.perform(put("/api/flight/put/1")
+                .contentType("application/json")
+                .content("{\"id\":1,\"origin\":Madrid,\"departureTime\":\"8:15\",\"arrivalTime\":\"11:00\",\"availableSeats\":35,\"status\":true\"}"))
+                .andExpect(status().isOk());
+                verify(flightService).updateFlight(any(Flight.class), any(Long.class));
     }
 
 }
