@@ -123,18 +123,26 @@ public class FlightControllerIntegrationTest {
     @Test
     void updateFlight() throws Exception {
         Flight updateFlight = new Flight();
-        updateFlight.setId(1);
-        updateFlight.setOrigin("Madrid");
-        updateFlight.setDepartureTime(LocalTime.of(8, 15));
-        updateFlight.setArrivalTime(LocalTime.of(11, 00));
-        updateFlight.setAvailableSeats(35);
-        updateFlight.setStatus(true);
+    updateFlight.setId(1L);
+    updateFlight.setOrigin("Madrid");
+    updateFlight.setDepartureTime(LocalTime.of(8, 15));
+    updateFlight.setArrivalTime(LocalTime.of(11, 00));
+    updateFlight.setAvailableSeats(35);
+    updateFlight.setStatus(true);
 
-        mockMvc.perform(put("/api/flight/put/1")
-                .contentType("application/json")
-                .content("{\"id\":1,\"origin\":Madrid,\"departureTime\":\"8:15\",\"arrivalTime\":\"11:00\",\"availableSeats\":35,\"status\":true\"}"))
-                .andExpect(status().isOk());
-                verify(flightService).updateFlight(any(Flight.class), any(Long.class));
+    String updateFlightJson = "{\"id\":1L,\n"
+    + "\"origin\":\"Madrid\",\n"
+    + "\"departureTime\":\"08:15\",\n"
+    + "\"arrivalTime\":\"11:00\",\n"
+    + "\"availableSeats\":35,\n"
+    + "\"status\":true}";
+
+    mockMvc.perform(put("/api/flight/put/1")
+            .contentType(MediaType.APPLICATION_JSON)
+            .content(updateFlightJson))
+            .andExpect(status().isOk());
+
+    verify(flightService).updateFlight(any(Flight.class), any(Long.class));
     }
 
 }
