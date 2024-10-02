@@ -24,11 +24,7 @@ public class DestinationService {
     }
 
     public List<Destination> getAllDestination() {
-        try {
-            return iDestinationRepository.findAll();
-        } catch (Exception e) {
-            throw new RuntimeException("Error retrieving destinations.", e);
-        }
+        return iDestinationRepository.findAll();
     }
 
     public Destination getDestinationById(long id) {
@@ -36,7 +32,7 @@ public class DestinationService {
                 .orElseThrow(() -> new DestinationNotFoundException("Destination not found with ID: " + id));
     }
 
-    public void updateDestination(Destination destination, long id) {
+    public Destination updateDestination(Destination destination, long id) {
         if (!iDestinationRepository.existsById(id)) {
             throw new DestinationNotFoundException("Destination not found with ID: " + id);
         }
@@ -45,8 +41,10 @@ public class DestinationService {
             throw new InvalidRequestException("Invalid destination data provided.");
         }
 
+        // Set the ID of the updated destination
         destination.setId(id);
-        iDestinationRepository.save(destination);
+
+        return iDestinationRepository.save(destination); // Return the updated destination
     }
 
     public boolean deleteDestination(long id) {
@@ -54,11 +52,7 @@ public class DestinationService {
             throw new DestinationNotFoundException("Destination not found with ID: " + id);
         }
 
-        try {
-            iDestinationRepository.deleteById(id);
-            return true;
-        } catch (Exception e) {
-            throw new RuntimeException("Error deleting destination.", e);
-        }
+        iDestinationRepository.deleteById(id);
+        return true;
     }
 }
