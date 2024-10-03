@@ -30,7 +30,7 @@ public class UserServiceIntegrationTest {
     private User user2;
 
     @BeforeEach
-    public void setUp(){
+    public void setUp() {
         MockitoAnnotations.openMocks(this);
         user1 = new User();
         user1.setId(1L);
@@ -43,7 +43,7 @@ public class UserServiceIntegrationTest {
         user2.setUsername("Isabel");
         user2.setPassword("conejitos");
         user2.setRole(ERole.ROLE_USER);
-}
+    }
 
     @Test
     void createUser() throws Exception{
@@ -93,7 +93,7 @@ public class UserServiceIntegrationTest {
     }
 
     @Test
-    void updateUser(){
+    void updateUser() {
         User user = new User();
 
         when(iUserRepository.findById(1L)).thenReturn(Optional.of(User));
@@ -105,6 +105,8 @@ public class UserServiceIntegrationTest {
 
         verify(iUserRepository).save(user);
 
+    }
+
         @Test
         void deleteUser() {
             long id = 2L;
@@ -113,5 +115,5 @@ public class UserServiceIntegrationTest {
         }
     }
 
-}
+
 
