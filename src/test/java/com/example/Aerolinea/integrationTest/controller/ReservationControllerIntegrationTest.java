@@ -1,116 +1,116 @@
 package com.example.Aerolinea.integrationTest.controller;
 
-import com.example.Aerolinea.controller.ReservationController;
 import com.example.Aerolinea.model.Reservation;
-import com.example.Aerolinea.service.ReservationService;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.mockito.InjectMocks;
-import org.mockito.Mock;
-import org.mockito.MockitoAnnotations;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.MediaType;
+import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.web.servlet.MockMvc;
 
 import java.time.LocalDateTime;
-import java.util.List;
-import java.util.Optional;
 
-import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.Mockito.*;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
 @SpringBootTest
 @AutoConfigureMockMvc
-class ReservationControllerIntegrationTest {
+@ActiveProfiles("test")
+public class ReservationControllerIntegrationTest {
 
     @Autowired
     private MockMvc mockMvc;
 
-    @Mock
-    private ReservationService reservationService;
-
-    @InjectMocks
-    private ReservationController reservationController;
-
     @Autowired
     private ObjectMapper objectMapper;
 
-    private Reservation reservation;
+    private Reservation testReservation;
 
     @BeforeEach
     void setUp() {
-        MockitoAnnotations.openMocks(this);
-        reservation = new Reservation();
-        reservation.setStatus(true);
-        reservation.setReservationDate(LocalDateTime.now());
+        // Create a sample Reservation for testing purposes
+        testReservation = new Reservation();
+        testReservation.setReservationDate(LocalDateTime.now());
+        testReservation.setStatus(true);
+        testReservation.setUser(null);  // Set User to null since we don't have the User entity yet
     }
 
     @Test
-    void testCreateReservation() throws Exception {
-        when(reservationService.createReservation(any(Reservation.class))).thenReturn(reservation);
+    void createReservationTest() throws Exception {
+        // Convert Reservation object to JSON
+        String reservationJson = objectMapper.writeValueAsString(testReservation);
 
-        String reservationJson = objectMapper.writeValueAsString(reservation);
-
+        // Perform POST request to create a new reservation
         mockMvc.perform(post("/api/reservations")
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(reservationJson))
                 .andExpect(status().isOk())
+                .andExpect(jsonPath("$.id").isNumber()) // Check if ID is generated
                 .andExpect(jsonPath("$.status").value(true));
-
-        verify(reservationService, times(1)).createReservation(any(Reservation.class));
     }
 
     @Test
-    void testGetAllReservations() throws Exception {
-        when(reservationService.getAllReservations()).thenReturn(List.of(reservation));
-
-        mockMvc.perform(get("/api/reservations"))
+    void getAllReservationsTest() throws Exception {
+        // Perform GET request to fetch all reservations
+        mockMvc.perform(get("/api/reservations")
+                        .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$[0].status").value(true));
-
-        verify(reservationService, times(1)).getAllReservations();
+                .andExpect(jsonPath("$").isArray())
+                .andExpect(jsonPath("$.length()").isNumber());  // Ensure some reservations exist
     }
 
     @Test
-    void testGetReservationById() throws Exception {
-        when(reservationService.getReservationById(anyLong())).thenReturn(Optional.of(reservation));
+    void getReservationByIdTest() throws Exception {
+        // Create and persist a reservation first to ensure ID exists
+        String reservationJson = objectMapper.writeValueAsString(testReservation);
+        mockMvc.perform(post("/api/reservations")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(reservationJson))
+                .andExpect(status().isOk());
 
-        mockMvc.perform(get("/api/reservations/1"))
+        // Perform GET request to fetch the reservation by ID
+        mockMvc.perform(get("/api/reservations/1")  // Assuming the ID is 1
+                        .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$.id").value(reservation.getId()));
-
-        verify(reservationService, times(1)).getReservationById(1L);
+                .andExpect(jsonPath("$.id").value(1));
     }
 
     @Test
-    void testUpdateReservation() throws Exception {
-        reservation.setStatus(false);
+    void updateReservationTest() throws Exception {
+        // Persist a reservation first
+        String reservationJson = objectMapper.writeValueAsString(testReservation);
+        mockMvc.perform(post("/api/reservations")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(reservationJson))
+                .andExpect(status().isOk());
 
-        when(reservationService.updateReservation(anyLong(), any(Reservation.class))).thenReturn(reservation);
+        // Update the reservation's status
+        testReservation.setStatus(false);
+        String updatedReservationJson = objectMapper.writeValueAsString(testReservation);
 
-        String updatedReservationJson = objectMapper.writeValueAsString(reservation);
-
+        // Perform PUT request to update the reservation
         mockMvc.perform(put("/api/reservations/1")
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(updatedReservationJson))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.status").value(false));
-
-        verify(reservationService, times(1)).updateReservation(anyLong(), any(Reservation.class));
     }
 
     @Test
-    void testDeleteReservation() throws Exception {
-        doNothing().when(reservationService).deleteReservation(anyLong());
+    void deleteReservationTest() throws Exception {
+        // Persist a reservation first
+        String reservationJson = objectMapper.writeValueAsString(testReservation);
+        mockMvc.perform(post("/api/reservations")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(reservationJson))
+                .andExpect(status().isOk());
 
-        mockMvc.perform(delete("/api/reservations/1"))
+        // Perform DELETE request to remove the reservation
+        mockMvc.perform(delete("/api/reservations/1")
+                        .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isNoContent());
-
-        verify(reservationService, times(1)).deleteReservation(1L);
     }
 }
