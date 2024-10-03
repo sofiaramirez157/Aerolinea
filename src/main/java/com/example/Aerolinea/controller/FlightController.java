@@ -32,17 +32,17 @@ public class FlightController {
     }
 
     @PutMapping(path = "put/{id}")
-    public void updateFlight(@RequestBody Flight flight, @PathVariable long id) {
-        flightService.updateFlight(flight, id);
+    public Flight updateFlight(@RequestBody Flight flight, @PathVariable long id) {
+       return flightService.updateFlight(flight, id);
     }
 
     @DeleteMapping(path = "delete/{id}")
     public String deleteFlightById(@PathVariable long id) {
         boolean ok = flightService.deleteFlight(id);
         if (ok) {
-            return "Flight with id" + id + "was deleted";
+            return "Flight with id " + id + " was deleted";
         } else {
-            return "Destination with id" + id + "not found";
+            return "Destination with id " + id + " not found";
         }
     }
 }

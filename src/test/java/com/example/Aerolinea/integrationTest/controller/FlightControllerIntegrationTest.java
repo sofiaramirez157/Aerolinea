@@ -90,20 +90,20 @@ public class FlightControllerIntegrationTest {
     void getAllFlight() throws Exception {
         when(flightService.getAllFlight()).thenReturn(flightList);
         mockMvc.perform(get("/api/flight/get"))
-        .andExpect(status().isOk())
-        .andExpect(content().contentType("application/json"))
-        .andExpect(jsonPath("$[0].id").value(1))
+            .andExpect(status().isOk())
+            .andExpect(content().contentType("application/json"))
+            .andExpect(jsonPath("$[0].id").value(1))
             .andExpect(jsonPath("$[0].origin").value("Madrid"))
             .andExpect(jsonPath("$[0].departureTime").value("08:15"))
             .andExpect(jsonPath("$[0].arrivalTime").value("10:20"))
             .andExpect(jsonPath("$[0].availableSeats").value(60))
             .andExpect(jsonPath("$[0].status").value(true))
-            .andExpect(jsonPath("$.id").value(2))
-            .andExpect(jsonPath("$.origin").value("Scotland"))
-            .andExpect(jsonPath("$.departureTime").value("15:00"))
-            .andExpect(jsonPath("$.arrivalTime").value("20:35"))
-            .andExpect(jsonPath("$.availableSeats").value(0))
-            .andExpect(jsonPath("$.status").value(false));
+            .andExpect(jsonPath("$[1].id").value(2))
+            .andExpect(jsonPath("$[1].origin").value("Scotland"))
+            .andExpect(jsonPath("$[1].departureTime").value("15:00"))
+            .andExpect(jsonPath("$[1].arrivalTime").value("20:35"))
+            .andExpect(jsonPath("$[1].availableSeats").value(0))
+            .andExpect(jsonPath("$[1].status").value(false));
     }
 
     @Test
@@ -121,28 +121,39 @@ public class FlightControllerIntegrationTest {
     }
 
     @Test
-    void updateFlight() throws Exception {
+    void updateFlight() throws Exception {  
         Flight updateFlight = new Flight();
-    updateFlight.setId(1L);
-    updateFlight.setOrigin("Madrid");
-    updateFlight.setDepartureTime(LocalTime.of(8, 15));
-    updateFlight.setArrivalTime(LocalTime.of(11, 00));
-    updateFlight.setAvailableSeats(35);
-    updateFlight.setStatus(true);
+        updateFlight.setId(1);
+        updateFlight.setOrigin("Madrid");
+        updateFlight.setDepartureTime(LocalTime.of(8, 15));
+        updateFlight.setArrivalTime(LocalTime.of(11, 00));
+        updateFlight.setAvailableSeats(35);
+        updateFlight.setStatus(true);
+    
+        String updateFlightJson = "{\"id\":1,\n"
+        + "\"origin\":\"Madrid\",\n"
+        + "\"departureTime\":\"08:15\",\n"
+        + "\"arrivalTime\":\"11:00\",\n"
+        + "\"availableSeats\":35,\n"
+        + "\"status\":true}";
+    
+        mockMvc.perform(put("/api/flight/put/1")
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(updateFlightJson))
+                .andExpect(status().isOk());
+    
+        verify(flightService).updateFlight(any(Flight.class), any(Long.class));
+        }
 
-    String updateFlightJson = "{\"id\":1L,\n"
-    + "\"origin\":\"Madrid\",\n"
-    + "\"departureTime\":\"08:15\",\n"
-    + "\"arrivalTime\":\"11:00\",\n"
-    + "\"availableSeats\":35,\n"
-    + "\"status\":true}";
+        @Test
+         void deleteFlightTest() throws Exception{
+            when(flightService.deleteFlight(1)).thenReturn(true);
 
-    mockMvc.perform(put("/api/flight/put/1")
-            .contentType(MediaType.APPLICATION_JSON)
-            .content(updateFlightJson))
-            .andExpect(status().isOk());
+            mockMvc.perform(delete("/api/flight/delete/1")
+                    .contentType(MediaType.APPLICATION_JSON))
+                    .andExpect(status().isOk())
+                    .andExpect(jsonPath("$").value("Flight with id 1 was deleted"));
 
-    verify(flightService).updateFlight(any(Flight.class), any(Long.class));
-    }
+        }
 
 }

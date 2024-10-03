@@ -32,9 +32,9 @@ public class FlightService {
         }
     }
 
-    public void updateFlight(Flight flight, long id) {
+    public Flight updateFlight(Flight flight, long id) {
         flight.setId(id);
-        iFlightRepository.save(flight);
+        return iFlightRepository.save(flight);
     }
 
     public boolean deleteFlight(long id) {
