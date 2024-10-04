@@ -7,6 +7,8 @@ import com.example.Aerolinea.service.FlightService;
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.*;
+
+import java.time.LocalDate;
 import java.time.LocalTime;
 import java.util.ArrayList;
 import java.util.List;
@@ -86,6 +88,41 @@ public class FlightServiceIntegrationTest {
         assertEquals(false, result.get(1).isStatus());
     }
 
+    @Test
+    void getFlightById() {
+        when(iFlightRepository.findById(1L)).thenReturn(Optional.of(flight1));
+
+        Optional<Flight> flightId = flightService.getFlightById(1);
+
+        assertEquals("Madrid", flightId.get().getOrigin());
+    }
+
+    @Test
+    void updateFlight() {
+         when(iFlightRepository.save(any(Flight.class))).thenReturn(flight1);
+    Flight update = flight1;
+    update.setAvailableSeats(30);
+
+    flightService.updateFlight(update, 1);
+    assertEquals(1, update.getId());
+    assertEquals("Madrid", update.getOrigin());
+    assertEquals(LocalTime.of(8, 15), update.getDepartureTime());
+    assertEquals(LocalTime.of(10, 20), update.getArrivalTime());
+    assertEquals(30, update.getAvailableSeats());
+    assertEquals(true, update.isStatus());
     
+
+    verify(iFlightRepository, times(1)).save(update);
+
+    }
+
+    @Test
+    void deleteFlight() {
+        when(iFlightRepository.findById(2L)).thenReturn(Optional.of(flight2));
+    
+        flightService.deleteFlight(2);
+    
+        verify(iFlightRepository, times(1)).deleteById(2L);      
+    }
 
 }
