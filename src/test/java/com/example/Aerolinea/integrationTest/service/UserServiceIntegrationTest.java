@@ -51,10 +51,10 @@ public class UserServiceIntegrationTest {
         User newUser = userService.createUser(user2);
 
         assertNotNull(newUser);
-        assertNotNull(2,String.valueOf((newUser.getId())));
-        assertNotNull("Sofia"), newUser.getUsername());
-        assertNotNull("perritos"), newUser.getPassword());
-        assertNotNull("usuario"), newUser.getRole());
+        assertNotNull(2,String.valueOf(newUser.getId()));
+        assertNotNull("Sofia", newUser.getUsername());
+        assertNotNull("perritos", newUser.getPassword());
+        assertNotNull("usuario", String.valueOf(newUser.getRole()));
 
     verify(iUserRepository, times(1)).save(user2);
 
@@ -87,8 +87,8 @@ public class UserServiceIntegrationTest {
         Optional<User> foundUser = userService.getUserById(1);
 
         assertTrue(foundUser.isPresent());
-        assertEquals(1l), foundUser.get().getId();
-        assertEquals("Sofia"), foundUser.get().getUsername();
+        assertEquals(1l, foundUser.get().getId());
+        assertEquals("Sofia", foundUser.get().getUsername());
 
     }
 
@@ -96,7 +96,7 @@ public class UserServiceIntegrationTest {
     void updateUser() {
         User user = new User();
 
-        when(iUserRepository.findById(1L)).thenReturn(Optional.of(User));
+        when(iUserRepository.findById(1L)).thenReturn(Optional.of(user));
 
         user.setUsername("Sofia");
         user.setPassword("perritos");

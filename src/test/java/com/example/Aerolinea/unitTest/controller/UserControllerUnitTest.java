@@ -16,6 +16,7 @@ import org.springframework.test.web.servlet.MockMvc;
 import java.util.*;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyLong;
 import static org.mockito.Mockito.when;
@@ -46,47 +47,64 @@ public class UserControllerUnitTest {
     void testCreateReservation() {
         when(userService.createUser(any(User.class))).thenReturn(user);
 
-        ResponseEntity<User> response = userController.createUser(user);
+        User response = userController.createUser(user);
 
-        assertEquals(200, response.getStatusCodeValue());
-        assertEquals(user.getId(), response.getBody().getId());
+        assertEquals(user.getId(), response.getId());
+        assertEquals(user.getUsername(), response.getUsername());
+        assertEquals(user.getPassword(), response.getPassword());
+        assertEquals(user.getRole(), response.getRole());
     }
 
     @Test
     void testGetAllReservations() {
         when(userService.getAllUsers()).thenReturn(Collections.singletonList(user));
 
-        ResponseEntity<?> response = userController.getAllUsers();
+        List<User> response = userController.getAllUsers();
 
-        assertEquals(200, response.getStatusCodeValue());
-        assertEquals(1, ((List<?>) Objects.requireNonNull(response.getBody())).size());
+        assertEquals(user.getId(), response.get(0).getId());
+        assertEquals(user.getUsername(), response.get(0).getUsername());
+        assertEquals(user.getPassword(),response.get(0).getPassword());
+        assertEquals(user.getRole(), response.get(0).getRole());
     }
 
     @Test
     void testGetReservationById() {
         when(userService.getUserById(anyLong())).thenReturn(Optional.of(user));
 
-        ResponseEntity<User> response = userController.getUserById(1L);
+        Optional<User> response = userController.getUserById(1l);
 
-        assertEquals(200, response.getStatusCodeValue());
-        assertEquals(user.getId(), response.getBody().getId());
+        assertTrue(response.isPresent());
+        assertEquals(user.getId(), response.get().getId());
+        assertEquals(user.getUsername(), response.get().getUsername());
+        assertEquals(user.getPassword(), response.get().getPassword());
+        assertEquals(user.getRole(), response.get().getRole());
     }
 
     @Test
     void testUpdateReservation() {
-        when(userService.updateUser(anyLong(), any(User.class))).thenReturn(user);
+        User updatedUser = new User();
+        updatedUser.setId(1L);
+        updatedUser.setUsername("New Paris");
+        updatedUser.setPassword("France");
+        updatedUser.setRole(ERole.ROLE_USER);
 
-        ResponseEntity<User> response = userController.updateUser(user, 1L);
+        when(userService.updateUser(updatedUser, 1L)).thenReturn(updatedUser);
 
-        assertEquals(200, response.getStatusCodeValue());
-        assertEquals(user.getId(), response.getBody().getId());
+        User response = userController.updateUser(updatedUser, 1L);
+
+        assertEquals(updatedUser.getId(), response.getId());
+        assertEquals(updatedUser.getUsername(), response.getUsername());
+        assertEquals(updatedUser.getPassword(), response.getPassword());
+        assertEquals(updatedUser.getRole(), response.getRole());
     }
 
     @Test
     void testDeleteReservation() {
-        ResponseEntity<String> response = userController.deleteUserById(1L);
+        when(userService.deleteUser(1L)).thenReturn(true);
 
-        assertEquals(204, response.getStatusCodeValue());
+        String response = userController.deleteUserById(1L);
+
+        assertEquals("User with id 1 was deleted.", response);
     }
 }
 
