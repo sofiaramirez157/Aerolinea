@@ -69,19 +69,22 @@ public class DestinationServiceUnitTest {
         assertTrue(foundDestination.isPresent());
         assertEquals(destination.getId(), foundDestination.get().getId());
     }
+    @Test
+    void updateDestinationTest() {
+        Destination updatedDestination = new Destination();
+        updatedDestination.setId(1L);
+        updatedDestination.setName("Roma");
+        updatedDestination.setCountry("Italia");
 
-//    @Test
-//    void updateDestinationTest() {
-//        when(iDestinationRepository.findById(1L)).thenReturn(Optional.of(destination));
-//
-//        destination.setId(1);
-//        Destination updatedDestination = destinationService.updateDestination(destination, 1L);
-//
-//        assertNotNull(updatedDestination);
-//        assertEquals(destination.getId(), updatedDestination.getId());
-//        assertEquals(destination.getName(), updatedDestination.getName());
-//        assertEquals(destination.getCountry(), updatedDestination.getCountry());
-//    }
+        when(iDestinationRepository.findById(1L)).thenReturn(Optional.of(updatedDestination));
+
+        Destination result = destinationService.updateDestination(updatedDestination, 1L);
+
+        assertNotNull(result);
+        assertEquals(updatedDestination.getId(), result.getId());
+        assertEquals(updatedDestination.getName(), result.getName());
+        assertEquals(updatedDestination.getCountry(), result.getCountry());
+    }
 
     @Test
     void deleteDestinationTest() {

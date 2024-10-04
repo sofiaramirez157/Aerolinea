@@ -13,6 +13,7 @@ import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
 
@@ -52,18 +53,17 @@ public class DestinationControllerUnitTest {
         assertEquals(destination.getCountry(),response.getCountry());
     }
 
-//    @Test
-//    void getAllDestinationTest() {
-//        when(destinationService.getAllDestination()).thenReturn(destinationList);
-//
-//        List<Destination> response = destinationController.getAllDestination();
-//
-//
-//        assertEquals(1, response.size());
-//        assertEquals(destination.getId(), response.get(0).getId());
-//        assertEquals(destination.getName(), response.get(0).getName());
-//        assertEquals(destination.getCountry(), response.get(0).getCountry());
-//    }
+    @Test
+    void getAllDestinationTest() {
+        when(destinationService.getAllDestination()).thenReturn(Collections.singletonList(destination));
+
+        List<Destination> response = destinationController.getAllDestination();
+
+        assertEquals(destination.getId(), response.get(0).getId());
+        assertEquals(destination.getName(), response.get(0).getName());
+        assertEquals(destination.getCountry(),response.get(0).getCountry());
+
+    }
 
     @Test
     void getDestinationIdTest() {
