@@ -87,7 +87,7 @@ public class UserServiceIntegrationTest {
         Optional<User> foundUser = userService.getUserById(1);
 
         assertTrue(foundUser.isPresent());
-        assertEquals("1L"), foundUser.get().getId();
+        assertEquals(1l), foundUser.get().getId();
         assertEquals("Sofia"), foundUser.get().getUsername();
 
     }

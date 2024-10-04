@@ -35,9 +35,9 @@ public class UserService {
         }
     }
 
-    public void updateUser(User user, long id) {
+    public User updateUser(User user, long id) {
         user.setId(id);
-        userRepository.save(user);
+        return userRepository.save(user);
     }
 
     public boolean deleteUser(long id) {

@@ -2,6 +2,7 @@ package com.example.Aerolinea.controller;
 
 import com.example.Aerolinea.model.User;
 import com.example.Aerolinea.service.UserService;
+import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -17,12 +18,13 @@ public class UserController {
         this.userService = userService;
     }
 
-    @PostMapping("/")
+
+    @PostMapping
     public User createUser(@RequestBody User user) {
         return userService.createUser(user);
     }
 
-    @GetMapping("/")
+    @GetMapping
     public List<User> getAllUsers() {
         return userService.getAllUsers();
     }
@@ -33,8 +35,8 @@ public class UserController {
     }
 
     @PutMapping("/{id}")
-    public void updateUser(@RequestBody User user, @PathVariable long id) {
-        userService.updateUser(user, id);
+    public User updateUser(@RequestBody User user, @PathVariable long id) {
+        return userService.updateUser(user, id);
     }
 
     @DeleteMapping("/{id}")

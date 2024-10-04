@@ -55,7 +55,7 @@ public class UserServiceUnitTest {
             @Test
             void getAllUserTest () {
             List<User> userList = new ArrayList<>();
-            userList.add(User);
+            userList.add(user);
 
             when(iUserRepository.findAll()).thenReturn(userList);
 
@@ -86,9 +86,6 @@ public class UserServiceUnitTest {
 
             assertTrue(isDelete);
             verify(iUserRepository, times(1)).deleteById(user.getId());
-
-            }
-
-        }
     }
 }
+
