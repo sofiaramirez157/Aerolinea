@@ -13,7 +13,7 @@ public class TestSecurityConfig {
         http
                 .csrf(csrf -> csrf.disable())
                 .authorizeHttpRequests(authz -> authz
-                        .requestMatchers("/api/**").permitAll()  // Replace antMatchers with requestMatchers
+                        .requestMatchers("/api/**").permitAll()
                         .anyRequest().permitAll()
                 );
         return http.build();

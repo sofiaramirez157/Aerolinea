@@ -38,7 +38,7 @@ public class ReservationControllerIntegrationTest {
         testReservation = new Reservation();
         testReservation.setReservationDate(LocalDateTime.now());
         testReservation.setStatus(true);
-        testReservation.setUser(null);  // Set User to null since we don't have the User entity yet
+        testReservation.setUser(null);  // Cambiar esto cuando se mergee a dev!!!
     }
 
     @Test
@@ -49,7 +49,7 @@ public class ReservationControllerIntegrationTest {
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(reservationJson))
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$.id").isNumber()) // Check if ID is generated
+                .andExpect(jsonPath("$.id").isNumber())
                 .andExpect(jsonPath("$.status").value(true));
     }
 
@@ -59,7 +59,7 @@ public class ReservationControllerIntegrationTest {
                         .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$").isArray())
-                .andExpect(jsonPath("$.length()").isNumber());  // Ensure some reservations exist
+                .andExpect(jsonPath("$.length()").isNumber());
     }
 
     @Test
@@ -70,7 +70,7 @@ public class ReservationControllerIntegrationTest {
                         .content(reservationJson))
                 .andExpect(status().isOk());
 
-        mockMvc.perform(get("/api/reservations/1")  // Assuming the ID is 1
+        mockMvc.perform(get("/api/reservations/1")
                         .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.id").value(1));
@@ -88,12 +88,12 @@ public class ReservationControllerIntegrationTest {
 
         String responseBody = result.getResponse().getContentAsString();
         Reservation createdReservation = objectMapper.readValue(responseBody, Reservation.class);
-        Long reservationId = createdReservation.getId(); // Get the actual ID of the created reservation
+        Long reservationId = createdReservation.getId();
 
         mockMvc.perform(get("/api/reservations/" + reservationId)
                         .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$.id").value(reservationId)); // Ensure it returns the correct ID
+                .andExpect(jsonPath("$.id").value(reservationId));
 
         testReservation.setStatus(false);
         String updatedReservationJson = objectMapper.writeValueAsString(testReservation);
