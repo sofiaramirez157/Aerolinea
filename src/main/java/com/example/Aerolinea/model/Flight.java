@@ -41,5 +41,4 @@ public class Flight {
     @Column(name = "status")
     private boolean status;
 
-
 }

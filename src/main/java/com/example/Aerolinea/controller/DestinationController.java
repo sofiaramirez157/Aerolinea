@@ -2,6 +2,8 @@ package com.example.Aerolinea.controller;
 
 import com.example.Aerolinea.model.Destination;
 import com.example.Aerolinea.service.DestinationService;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -16,33 +18,37 @@ public class DestinationController {
         this.destinationService = destinationService;
     }
 
-    @PostMapping(path = "/")
-    public Destination createDestination(@RequestBody Destination destination) {
-        return destinationService.createDestination(destination);
+    @PostMapping("/")
+    public ResponseEntity<Destination> createDestination(@RequestBody Destination destination) {
+        Destination createdDestination = destinationService.createDestination(destination);
+        return new ResponseEntity<>(createdDestination, HttpStatus.CREATED);
     }
 
-    @GetMapping(path = "/")
-    public List<Destination> getAllDestination() {
-        return destinationService.getAllDestination();
+    @GetMapping("/")
+    public ResponseEntity<List<Destination>> getAllDestination() {
+        List<Destination> destinations = destinationService.getAllDestination();
+        return new ResponseEntity<>(destinations, HttpStatus.OK);
     }
 
-    @GetMapping(path = "/{id}")
-    public Destination getDestinationById(@PathVariable long id) {
-        return destinationService.getDestinationById(id);
+    @GetMapping("/{id}")
+    public ResponseEntity<Destination> getDestinationById(@PathVariable long id) {
+        Destination destination = destinationService.getDestinationById(id);
+        return new ResponseEntity<>(destination, HttpStatus.OK);
     }
 
-    @PutMapping(path = "/{id}")
-    public void updateDestination(@RequestBody Destination destination, @PathVariable long id) {
+    @PutMapping("/{id}")
+    public ResponseEntity<Void> updateDestination(@RequestBody Destination destination, @PathVariable long id) {
         destinationService.updateDestination(destination, id);
+        return new ResponseEntity<>(HttpStatus.NO_CONTENT);
     }
 
-    @DeleteMapping(path = "/{id}")
-    public String deleteDestinationById(@PathVariable long id) {
-        boolean ok = destinationService.deleteDestination(id);
-        if (ok) {
-            return "Destination with id " + id + " was deleted";
+    @DeleteMapping("/{id}")
+    public ResponseEntity<String> deleteDestinationById(@PathVariable long id) {
+        boolean deleted = destinationService.deleteDestination(id);
+        if (deleted) {
+            return new ResponseEntity<>("Destination with ID " + id + " was deleted.", HttpStatus.OK);
         } else {
-            return "Destination with id " + id + " not found";
+            return new ResponseEntity<>("Destination with ID " + id + " not found.", HttpStatus.NOT_FOUND);
         }
     }
 }

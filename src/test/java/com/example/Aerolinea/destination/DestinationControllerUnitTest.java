@@ -8,6 +8,8 @@ import org.junit.jupiter.api.Test;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 
 import java.util.Arrays;
 import java.util.List;
@@ -44,35 +46,38 @@ public class DestinationControllerUnitTest {
     void createDestinationTest() {
         when(destinationService.createDestination(any(Destination.class))).thenReturn(destination);
 
-        Destination response = destinationController.createDestination(destination);
+        ResponseEntity<Destination> response = destinationController.createDestination(destination);
 
-        assertEquals(destination.getId(), response.getId());
-        assertEquals(destination.getName(), response.getName());
-        assertEquals(destination.getCountry(), response.getCountry());
+        assertEquals(HttpStatus.CREATED, response.getStatusCode());
+        assertEquals(destination.getId(), response.getBody().getId());
+        assertEquals(destination.getName(), response.getBody().getName());
+        assertEquals(destination.getCountry(), response.getBody().getCountry());
     }
 
     @Test
     void getAllDestinationTest() {
         when(destinationService.getAllDestination()).thenReturn(destinationList);
 
-        List<Destination> response = destinationController.getAllDestination();
+        ResponseEntity<List<Destination>> response = destinationController.getAllDestination();
 
-        assertEquals(1, response.size());
-        assertEquals(destination.getId(), response.get(0).getId());
-        assertEquals(destination.getName(), response.get(0).getName());
-        assertEquals(destination.getCountry(), response.get(0).getCountry());
+        assertEquals(HttpStatus.OK, response.getStatusCode());
+        assertEquals(1, response.getBody().size());
+        assertEquals(destination.getId(), response.getBody().get(0).getId());
+        assertEquals(destination.getName(), response.getBody().get(0).getName());
+        assertEquals(destination.getCountry(), response.getBody().get(0).getCountry());
     }
 
     @Test
     void getDestinationByIdTest() {
         when(destinationService.getDestinationById(1L)).thenReturn(destination);
 
-        Destination response = destinationController.getDestinationById(1L);
+        ResponseEntity<Destination> response = destinationController.getDestinationById(1L);
 
-        assertNotNull(response);
-        assertEquals(destination.getId(), response.getId());
-        assertEquals(destination.getName(), response.getName());
-        assertEquals(destination.getCountry(), response.getCountry());
+        assertEquals(HttpStatus.OK, response.getStatusCode());
+        assertNotNull(response.getBody());
+        assertEquals(destination.getId(), response.getBody().getId());
+        assertEquals(destination.getName(), response.getBody().getName());
+        assertEquals(destination.getCountry(), response.getBody().getCountry());
     }
 
     @Test
@@ -82,8 +87,9 @@ public class DestinationControllerUnitTest {
         updatedDestination.setName("Paris");
         updatedDestination.setCountry("France");
 
-        destinationController.updateDestination(updatedDestination, 1L);
+        ResponseEntity<Void> response = destinationController.updateDestination(updatedDestination, 1L);
 
+        assertEquals(HttpStatus.NO_CONTENT, response.getStatusCode());
         verify(destinationService).updateDestination(updatedDestination, 1L);
     }
 
@@ -91,8 +97,19 @@ public class DestinationControllerUnitTest {
     void deleteDestinationByIdTest() {
         when(destinationService.deleteDestination(1L)).thenReturn(true);
 
-        String response = destinationController.deleteDestinationById(1L);
+        ResponseEntity<String> response = destinationController.deleteDestinationById(1L);
 
-        assertEquals("Destination with id 1 was deleted", response);
+        assertEquals(HttpStatus.OK, response.getStatusCode());
+        assertEquals("Destination with ID 1 was deleted.", response.getBody());
+    }
+
+    @Test
+    void deleteDestinationNotFoundTest() {
+        when(destinationService.deleteDestination(1L)).thenReturn(false);
+
+        ResponseEntity<String> response = destinationController.deleteDestinationById(1L);
+
+        assertEquals(HttpStatus.NOT_FOUND, response.getStatusCode());
+        assertEquals("Destination with ID 1 not found.", response.getBody());
     }
 }

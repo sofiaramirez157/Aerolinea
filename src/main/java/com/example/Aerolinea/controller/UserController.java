@@ -2,6 +2,8 @@ package com.example.Aerolinea.controller;
 
 import com.example.Aerolinea.model.User;
 import com.example.Aerolinea.service.UserService;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -17,8 +19,9 @@ public class UserController {
     }
 
     @PostMapping("/")
-    public User createUser(@RequestBody User user) {
-        return userService.createUser(user);
+    public ResponseEntity<User> createUser(@RequestBody User user) {
+        User createdUser = userService.createUser(user);
+        return new ResponseEntity<>(createdUser, HttpStatus.CREATED);
     }
 
     @GetMapping("/")
@@ -27,18 +30,20 @@ public class UserController {
     }
 
     @GetMapping("/{id}")
-    public User getUserById(@PathVariable long id) {
-        return userService.getUserById(id);
+    public ResponseEntity<User> getUserById(@PathVariable long id) {
+        User user = userService.getUserById(id);
+        return new ResponseEntity<>(user, HttpStatus.OK);
     }
 
     @PutMapping("/{id}")
-    public void updateUser(@RequestBody User user, @PathVariable long id) {
+    public ResponseEntity<Void> updateUser(@RequestBody User user, @PathVariable long id) {
         userService.updateUser(user, id);
+        return new ResponseEntity<>(HttpStatus.NO_CONTENT);
     }
 
     @DeleteMapping("/{id}")
-    public String deleteUserById(@PathVariable long id) {
+    public ResponseEntity<String> deleteUserById(@PathVariable long id) {
         userService.deleteUser(id);
-        return "User with ID " + id + " was deleted.";
+        return new ResponseEntity<>("User with ID " + id + " was deleted.", HttpStatus.OK);
     }
 }

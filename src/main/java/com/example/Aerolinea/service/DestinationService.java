@@ -36,8 +36,7 @@ public class DestinationService {
         if (!iDestinationRepository.existsById(id)) {
             throw new DestinationNotFoundException("Destination not found with ID: " + id);
         }
-
-        // Retrieve the existing destination by ID
+        
         Destination existingDestination = iDestinationRepository.findById(id)
                 .orElseThrow(() -> new DestinationNotFoundException("Destination not found with ID: " + id));
 
