@@ -75,19 +75,27 @@ public class DestinationServiceUnitTest {
 
     @Test
     void updateDestinationTest() {
-        // Prepare an updated destination
+        when(iDestinationRepository.existsById(1L)).thenReturn(true);
+        when(iDestinationRepository.findById(1L)).thenReturn(Optional.of(destination));
+
         Destination updatedDestination = new Destination();
         updatedDestination.setId(1L);
         updatedDestination.setName("New Paris");
         updatedDestination.setCountry("France");
 
-        when(iDestinationRepository.existsById(1L)).thenReturn(true);
-        when(iDestinationRepository.save(ArgumentMatchers.any(Destination.class))).thenReturn(updatedDestination);
+        when(iDestinationRepository.save(any(Destination.class))).thenReturn(updatedDestination);
 
-        destinationService.updateDestination(updatedDestination, 1L);
+        Destination result = destinationService.updateDestination(updatedDestination, 1L);
 
-        verify(iDestinationRepository, times(1)).save(updatedDestination);
-        assertEquals("New Paris", updatedDestination.getName());
+        verify(iDestinationRepository).save(argThat(savedDestination ->
+                savedDestination.getId() == 1L &&
+                        "New Paris".equals(savedDestination.getName()) &&
+                        "France".equals(savedDestination.getCountry())
+        ));
+
+        assertNotNull(result);
+        assertEquals("New Paris", result.getName());
+        assertEquals("France", result.getCountry());
     }
 
     @Test

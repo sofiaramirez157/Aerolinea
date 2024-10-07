@@ -85,13 +85,14 @@ public class DestinationServiceIntegrationTest {
 
     @Test
     void updateDestination() {
+        when(iDestinationRepository.existsById(1L)).thenReturn(true);
+        when(iDestinationRepository.findById(1L)).thenReturn(Optional.of(destination1));
+
         Destination updatedDestination = new Destination();
-        updatedDestination.setId(1L);
         updatedDestination.setName("Madrid");
         updatedDestination.setCountry("Spain");
 
-        when(iDestinationRepository.findById(1L)).thenReturn(Optional.of(destination1));
-        when(iDestinationRepository.save(any(Destination.class))).thenReturn(updatedDestination);
+        when(iDestinationRepository.save(any(Destination.class))).thenAnswer(invocation -> invocation.getArgument(0));
 
         Destination result = destinationService.updateDestination(updatedDestination, 1L);
 
@@ -99,8 +100,9 @@ public class DestinationServiceIntegrationTest {
         assertEquals("Madrid", result.getName());
         assertEquals("Spain", result.getCountry());
 
+        verify(iDestinationRepository).existsById(1L);
         verify(iDestinationRepository).findById(1L);
-        verify(iDestinationRepository).save(updatedDestination);
+        verify(iDestinationRepository).save(any(Destination.class));
     }
 
     @Test

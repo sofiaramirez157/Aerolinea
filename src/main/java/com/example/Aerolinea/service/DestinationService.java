@@ -37,14 +37,18 @@ public class DestinationService {
             throw new DestinationNotFoundException("Destination not found with ID: " + id);
         }
 
-        if (destination.getName() == null || destination.getCountry() == null) {
-            throw new InvalidRequestException("Invalid destination data provided.");
+        // Retrieve the existing destination by ID
+        Destination existingDestination = iDestinationRepository.findById(id)
+                .orElseThrow(() -> new DestinationNotFoundException("Destination not found with ID: " + id));
+
+        if (destination.getName() != null) {
+            existingDestination.setName(destination.getName());
+        }
+        if (destination.getCountry() != null) {
+            existingDestination.setCountry(destination.getCountry());
         }
 
-        // Set the ID of the updated destination
-        destination.setId(id);
-
-        return iDestinationRepository.save(destination); // Return the updated destination
+        return iDestinationRepository.save(existingDestination);
     }
 
     public boolean deleteDestination(long id) {
