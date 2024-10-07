@@ -3,7 +3,6 @@ package com.example.Aerolinea.unitTest.controller;
 import com.example.Aerolinea.controller.FlightController;
 import com.example.Aerolinea.model.Flight;
 import com.example.Aerolinea.service.FlightService;
-import com.fasterxml.jackson.databind.ObjectMapper;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.InjectMocks;
@@ -14,7 +13,6 @@ import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 
 import java.time.LocalTime;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
