@@ -1,4 +1,4 @@
-package com.example.Aerolinea.unitTest.controller;
+package com.example.Aerolinea.reservation;
 
 import com.example.Aerolinea.controller.ReservationController;
 import com.example.Aerolinea.model.Reservation;
@@ -8,7 +8,6 @@ import org.junit.jupiter.api.Test;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
-import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 
 import java.time.LocalDateTime;
@@ -21,7 +20,6 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyLong;
 import static org.mockito.Mockito.when;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 
 class ReservationControllerUnitTest {
 

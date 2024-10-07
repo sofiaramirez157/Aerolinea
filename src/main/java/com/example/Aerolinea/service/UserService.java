@@ -4,7 +4,6 @@ import com.example.Aerolinea.model.User;
 import com.example.Aerolinea.repositories.IUserRepository;
 import com.example.Aerolinea.exceptions.UserNotFoundException;
 import com.example.Aerolinea.exceptions.InvalidRequestException;
-import com.example.Aerolinea.exceptions.UnauthorizedAccessException;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -31,24 +30,24 @@ public class UserService {
                 .orElseThrow(() -> new UserNotFoundException("User not found with ID: " + id));
     }
 
-    public void updateUser(User user, long id) {
-        getUserById(id);
+    public User updateUser(User user, long id) {
         validateUser(user);
-        user.setId(id);
-        userRepository.save(user);
+        User existingUser = getUserById(id);
+
+        existingUser.setUsername(user.getUsername());
+        existingUser.setPassword(user.getPassword());
+        existingUser.setRole(user.getRole());
+
+        return userRepository.save(existingUser);
     }
 
-    public void deleteUser(long id) {
+    public boolean deleteUser(long id) {
         if (!userRepository.existsById(id)) {
             throw new UserNotFoundException("User not found with ID: " + id);
         }
-        userRepository.deleteById(id);
-    }
 
-    public void checkAccess(long userId, long currentUserId) {
-        if (userId != currentUserId) {
-            throw new UnauthorizedAccessException("You are not authorized to access this user's data.");
-        }
+        userRepository.deleteById(id);
+        return true;
     }
 
     private void validateUser(User user) {

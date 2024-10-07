@@ -1,4 +1,4 @@
-package com.example.Aerolinea.unitTest.exceptions;
+package com.example.Aerolinea.exceptions;
 
 import static org.junit.jupiter.api.Assertions.*;
 

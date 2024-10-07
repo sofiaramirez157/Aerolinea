@@ -1,4 +1,4 @@
-package com.example.Aerolinea.integrationTest.service;
+package com.example.Aerolinea.reservation;
 
 import com.example.Aerolinea.model.Reservation;
 import com.example.Aerolinea.repositories.IReservationRepository;

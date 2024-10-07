@@ -1,4 +1,4 @@
-package com.example.Aerolinea.integrationTest.controller;
+package com.example.Aerolinea.reservation;
 
 import com.example.Aerolinea.model.Reservation;
 import com.fasterxml.jackson.databind.ObjectMapper;

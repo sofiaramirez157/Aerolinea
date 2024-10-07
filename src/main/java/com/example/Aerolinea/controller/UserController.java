@@ -1,5 +1,6 @@
 package com.example.Aerolinea.controller;
 
+import com.example.Aerolinea.exceptions.UserNotFoundException;
 import com.example.Aerolinea.model.User;
 import com.example.Aerolinea.service.UserService;
 import org.springframework.http.HttpStatus;
@@ -25,8 +26,9 @@ public class UserController {
     }
 
     @GetMapping("/")
-    public List<User> getAllUsers() {
-        return userService.getAllUsers();
+    public ResponseEntity<List<User>> getAllUsers() {
+        List<User> users = userService.getAllUsers();
+        return new ResponseEntity<>(users, HttpStatus.OK);
     }
 
     @GetMapping("/{id}")
@@ -43,7 +45,11 @@ public class UserController {
 
     @DeleteMapping("/{id}")
     public ResponseEntity<String> deleteUserById(@PathVariable long id) {
-        userService.deleteUser(id);
-        return new ResponseEntity<>("User with ID " + id + " was deleted.", HttpStatus.OK);
+        try {
+            userService.deleteUser(id);
+            return new ResponseEntity<>("User with ID " + id + " was deleted.", HttpStatus.OK);
+        } catch (UserNotFoundException ex) {
+            return new ResponseEntity<>(ex.getMessage(), HttpStatus.NOT_FOUND);
+        }
     }
 }
