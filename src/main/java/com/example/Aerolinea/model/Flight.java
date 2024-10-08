@@ -41,4 +41,7 @@ public class Flight {
     @Column(name = "status")
     private boolean status;
 
+    @ManyToOne
+    @JoinColumn(name = "reservation_id")  // foreign key in the flight table
+    private Reservation reservation;
 }
