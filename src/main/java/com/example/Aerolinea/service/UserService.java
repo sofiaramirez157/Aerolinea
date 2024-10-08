@@ -1,7 +1,7 @@
 package com.example.Aerolinea.service;
 
 import com.example.Aerolinea.model.User;
-import com.example.Aerolinea.repositories.IUserRepository;
+import com.example.Aerolinea.repository.IUserRepository;
 import com.example.Aerolinea.exceptions.UserNotFoundException;
 import com.example.Aerolinea.exceptions.InvalidRequestException;
 import org.springframework.stereotype.Service;

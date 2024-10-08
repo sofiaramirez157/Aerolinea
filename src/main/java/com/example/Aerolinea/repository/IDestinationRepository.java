@@ -1,4 +1,4 @@
-package com.example.Aerolinea.repositories;
+package com.example.Aerolinea.repository;
 
 import com.example.Aerolinea.model.Destination;
 import org.springframework.data.jpa.repository.JpaRepository;

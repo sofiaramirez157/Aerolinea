@@ -1,7 +1,7 @@
 package com.example.Aerolinea.reservation;
 
 import com.example.Aerolinea.model.Reservation;
-import com.example.Aerolinea.repositories.IReservationRepository;
+import com.example.Aerolinea.repository.IReservationRepository;
 import com.example.Aerolinea.service.ReservationService;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;

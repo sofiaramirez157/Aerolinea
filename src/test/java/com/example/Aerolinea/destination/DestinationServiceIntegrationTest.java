@@ -1,7 +1,7 @@
 package com.example.Aerolinea.destination;
 
 import com.example.Aerolinea.model.Destination;
-import com.example.Aerolinea.repositories.IDestinationRepository;
+import com.example.Aerolinea.repository.IDestinationRepository;
 import com.example.Aerolinea.service.DestinationService;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -34,12 +34,12 @@ public class DestinationServiceIntegrationTest {
         destination1 = new Destination();
         destination1.setId(1);
         destination1.setCountry("France");
-        destination1.setCode("FR"); // Added code field
+        destination1.setCode("FR");
 
         destination2 = new Destination();
         destination2.setId(2);
         destination2.setCountry("Spain");
-        destination2.setCode("ES"); // Added code field
+        destination2.setCode("ES");
     }
 
     @Test
@@ -50,7 +50,7 @@ public class DestinationServiceIntegrationTest {
         assertNotNull(newDestination);
         assertEquals(2, newDestination.getId());
         assertEquals("Spain", newDestination.getCountry());
-        assertEquals("ES", newDestination.getCode()); // Added code assertion
+        assertEquals("ES", newDestination.getCode());
 
         verify(iDestinationRepository, times(1)).save(destination2);
     }
@@ -80,8 +80,8 @@ public class DestinationServiceIntegrationTest {
         Destination foundDestination = destinationService.getDestinationById(1);
 
         assertNotNull(foundDestination);
-        assertEquals("France", foundDestination.getCountry()); // Updated assertion
-        assertEquals("FR", foundDestination.getCode()); // Added code assertion
+        assertEquals("France", foundDestination.getCountry());
+        assertEquals("FR", foundDestination.getCode());
     }
 
     @Test
@@ -91,15 +91,15 @@ public class DestinationServiceIntegrationTest {
 
         Destination updatedDestination = new Destination();
         updatedDestination.setCountry("Spain");
-        updatedDestination.setCode("ES"); // Assuming you want to set a code
+        updatedDestination.setCode("ES");
 
         when(iDestinationRepository.save(any(Destination.class))).thenAnswer(invocation -> invocation.getArgument(0));
 
         Destination result = destinationService.updateDestination(updatedDestination, 1L);
 
         assertNotNull(result);
-        assertEquals("Spain", result.getCountry()); // Updated assertion
-        assertEquals("ES", result.getCode()); // Added code assertion
+        assertEquals("Spain", result.getCountry());
+        assertEquals("ES", result.getCode());
 
         verify(iDestinationRepository).existsById(1L);
         verify(iDestinationRepository).findById(1L);

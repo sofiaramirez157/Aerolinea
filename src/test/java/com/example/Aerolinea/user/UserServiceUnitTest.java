@@ -2,7 +2,7 @@ package com.example.Aerolinea.user;
 
 import com.example.Aerolinea.model.ERole;
 import com.example.Aerolinea.model.User;
-import com.example.Aerolinea.repositories.IUserRepository;
+import com.example.Aerolinea.repository.IUserRepository;
 import com.example.Aerolinea.service.UserService;
 import com.example.Aerolinea.exceptions.UserNotFoundException;
 import org.junit.jupiter.api.BeforeEach;

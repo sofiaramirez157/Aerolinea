@@ -45,10 +45,13 @@ public class DestinationController {
 
     @DeleteMapping("/{id}")
     public ResponseEntity<String> deleteDestinationById(@PathVariable long id) {
-        if (destinationService.deleteDestination(id)) {
-            return new ResponseEntity<>("Destination with ID " + id + " was deleted.", HttpStatus.OK);
-        } else {
-            throw new DestinationNotFoundException("Destination not found with ID: " + id);
+        try {
+            if (destinationService.deleteDestination(id)) {
+                return new ResponseEntity<>("Destination with ID " + id + " was deleted.", HttpStatus.OK);
+            }
+        } catch (DestinationNotFoundException ex) {
+            throw ex;
         }
+        return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
     }
 }

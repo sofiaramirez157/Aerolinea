@@ -1,7 +1,7 @@
 package com.example.Aerolinea.destination;
 
 import com.example.Aerolinea.model.Destination;
-import com.example.Aerolinea.repositories.IDestinationRepository;
+import com.example.Aerolinea.repository.IDestinationRepository;
 import com.example.Aerolinea.service.DestinationService;
 import com.example.Aerolinea.exceptions.DestinationNotFoundException;
 import org.junit.jupiter.api.BeforeEach;
@@ -34,7 +34,7 @@ public class DestinationServiceUnitTest {
         destination = new Destination();
         destination.setId(1L);
         destination.setCountry("France");
-        destination.setCode("FR"); // Added code field
+        destination.setCode("FR");
     }
 
     @Test
@@ -46,7 +46,7 @@ public class DestinationServiceUnitTest {
         assertNotNull(createdDestination);
         assertEquals(destination.getId(), createdDestination.getId());
         assertEquals(destination.getCountry(), createdDestination.getCountry());
-        assertEquals(destination.getCode(), createdDestination.getCode()); // Added code assertion
+        assertEquals(destination.getCode(), createdDestination.getCode());
     }
 
     @Test
@@ -71,8 +71,8 @@ public class DestinationServiceUnitTest {
 
         assertNotNull(foundDestination);
         assertEquals(destination.getId(), foundDestination.getId());
-        assertEquals(destination.getCountry(), foundDestination.getCountry()); // Added assertion for country
-        assertEquals(destination.getCode(), foundDestination.getCode()); // Added assertion for code
+        assertEquals(destination.getCountry(), foundDestination.getCountry());
+        assertEquals(destination.getCode(), foundDestination.getCode());
     }
 
     @Test
@@ -82,8 +82,8 @@ public class DestinationServiceUnitTest {
 
         Destination updatedDestination = new Destination();
         updatedDestination.setId(1L);
-        updatedDestination.setCountry("Spain"); // Updated country
-        updatedDestination.setCode("ES"); // Added code
+        updatedDestination.setCountry("Spain");
+        updatedDestination.setCode("ES");
 
         when(iDestinationRepository.save(any(Destination.class))).thenReturn(updatedDestination);
 
@@ -91,13 +91,13 @@ public class DestinationServiceUnitTest {
 
         verify(iDestinationRepository).save(argThat(savedDestination ->
                 savedDestination.getId() == 1L &&
-                        "Spain".equals(savedDestination.getCountry()) && // Updated assertion for country
-                        "ES".equals(savedDestination.getCode()) // Added assertion for code
+                        "Spain".equals(savedDestination.getCountry()) &&
+                        "ES".equals(savedDestination.getCode())
         ));
 
         assertNotNull(result);
-        assertEquals("Spain", result.getCountry()); // Updated assertion for country
-        assertEquals("ES", result.getCode()); // Added assertion for code
+        assertEquals("Spain", result.getCountry());
+        assertEquals("ES", result.getCode());
     }
 
     @Test
@@ -105,7 +105,7 @@ public class DestinationServiceUnitTest {
         Destination updatedDestination = new Destination();
         updatedDestination.setId(2L);
         updatedDestination.setCountry("Nowhere");
-        updatedDestination.setCode("NW"); // Added code
+        updatedDestination.setCode("NW");
 
         when(iDestinationRepository.existsById(2L)).thenReturn(false);
 

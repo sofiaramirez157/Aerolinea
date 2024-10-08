@@ -1,6 +1,7 @@
 package com.example.Aerolinea.destination;
 
 import com.example.Aerolinea.controller.DestinationController;
+import com.example.Aerolinea.exceptions.DestinationNotFoundException;
 import com.example.Aerolinea.model.Destination;
 import com.example.Aerolinea.service.DestinationService;
 import org.junit.jupiter.api.BeforeEach;
@@ -11,7 +12,7 @@ import org.mockito.MockitoAnnotations;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 
-import java.util.Arrays;
+import java.util.Collections;
 import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.*;
@@ -36,10 +37,10 @@ public class DestinationControllerUnitTest {
 
         destination = new Destination();
         destination.setId(1L);
-        destination.setCountry("Spain"); // Corrected the previous country assignment
-        destination.setCode("ES"); // Assuming you want to set a code
+        destination.setCountry("Spain");
+        destination.setCode("ES");
 
-        destinationList = Arrays.asList(destination);
+        destinationList = Collections.singletonList(destination);
     }
 
     @Test
@@ -49,9 +50,10 @@ public class DestinationControllerUnitTest {
         ResponseEntity<Destination> response = destinationController.createDestination(destination);
 
         assertEquals(HttpStatus.CREATED, response.getStatusCode());
+        assertNotNull(response.getBody());
         assertEquals(destination.getId(), response.getBody().getId());
         assertEquals(destination.getCountry(), response.getBody().getCountry());
-        assertEquals(destination.getCode(), response.getBody().getCode()); // Added code assertion
+        assertEquals(destination.getCode(), response.getBody().getCode());
     }
 
     @Test
@@ -61,10 +63,11 @@ public class DestinationControllerUnitTest {
         ResponseEntity<List<Destination>> response = destinationController.getAllDestination();
 
         assertEquals(HttpStatus.OK, response.getStatusCode());
+        assertNotNull(response.getBody());
         assertEquals(1, response.getBody().size());
         assertEquals(destination.getId(), response.getBody().get(0).getId());
         assertEquals(destination.getCountry(), response.getBody().get(0).getCountry());
-        assertEquals(destination.getCode(), response.getBody().get(0).getCode()); // Added code assertion
+        assertEquals(destination.getCode(), response.getBody().get(0).getCode());
     }
 
     @Test
@@ -77,7 +80,7 @@ public class DestinationControllerUnitTest {
         assertNotNull(response.getBody());
         assertEquals(destination.getId(), response.getBody().getId());
         assertEquals(destination.getCountry(), response.getBody().getCountry());
-        assertEquals(destination.getCode(), response.getBody().getCode()); // Added code assertion
+        assertEquals(destination.getCode(), response.getBody().getCode());
     }
 
     @Test
@@ -85,7 +88,9 @@ public class DestinationControllerUnitTest {
         Destination updatedDestination = new Destination();
         updatedDestination.setId(1L);
         updatedDestination.setCountry("France");
-        updatedDestination.setCode("FR"); // Assuming you want to set a code
+        updatedDestination.setCode("FR");
+
+        when(destinationService.updateDestination(any(Destination.class), any(Long.class))).thenReturn(updatedDestination);
 
         ResponseEntity<Void> response = destinationController.updateDestination(updatedDestination, 1L);
 
@@ -105,11 +110,11 @@ public class DestinationControllerUnitTest {
 
     @Test
     void deleteDestinationNotFoundTest() {
-        when(destinationService.deleteDestination(1L)).thenReturn(false);
+        when(destinationService.deleteDestination(1L)).thenThrow(new DestinationNotFoundException("Destination not found with ID: 1"));
 
         ResponseEntity<String> response = destinationController.deleteDestinationById(1L);
 
         assertEquals(HttpStatus.NOT_FOUND, response.getStatusCode());
-        assertEquals("Destination not found with ID: 1", response.getBody()); // Adjusted message
+        assertEquals("Destination not found with ID: 1", response.getBody());
     }
 }

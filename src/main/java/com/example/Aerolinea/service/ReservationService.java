@@ -1,7 +1,7 @@
 package com.example.Aerolinea.service;
 
 import com.example.Aerolinea.model.Reservation;
-import com.example.Aerolinea.repositories.IReservationRepository;
+import com.example.Aerolinea.repository.IReservationRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 

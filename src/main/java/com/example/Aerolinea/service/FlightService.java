@@ -8,8 +8,8 @@ import com.example.Aerolinea.exceptions.FlightNotAvailableException;
 import com.example.Aerolinea.exceptions.InvalidRequestException;
 import com.example.Aerolinea.model.Destination;
 import com.example.Aerolinea.model.Flight;
-import com.example.Aerolinea.repositories.IDestinationRepository;
-import com.example.Aerolinea.repositories.IFlightRepository;
+import com.example.Aerolinea.repository.IDestinationRepository;
+import com.example.Aerolinea.repository.IFlightRepository;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
