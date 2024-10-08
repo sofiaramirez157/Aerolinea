@@ -16,8 +16,8 @@ import java.util.Set;
 public class ReservationDTO {
 
     private Long id;
-    private Long userId; // Assuming you want to include only the user ID
+    private Long userId;
     private LocalDateTime reservationDate;
     private boolean status;
-    private Set<Long> flightIds = new HashSet<>(); // Assuming you want to transfer flight IDs
+    private Set<Long> flightIds = new HashSet<>();
 }

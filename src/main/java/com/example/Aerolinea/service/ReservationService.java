@@ -1,8 +1,9 @@
 package com.example.Aerolinea.service;
 
+import com.example.Aerolinea.exceptions.InvalidRequestException;
+import com.example.Aerolinea.exceptions.ReservationNotFoundException;
 import com.example.Aerolinea.model.Reservation;
 import com.example.Aerolinea.repository.IReservationRepository;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -13,12 +14,14 @@ public class ReservationService {
 
     private final IReservationRepository iReservationRepository;
 
-    @Autowired
     public ReservationService(IReservationRepository iReservationRepository) {
         this.iReservationRepository = iReservationRepository;
     }
 
     public Reservation createReservation(Reservation reservation) {
+        if (reservation == null || reservation.getUser() == null || reservation.getFlights() == null) {
+            throw new InvalidRequestException("Invalid reservation data provided.");
+        }
         return iReservationRepository.save(reservation);
     }
 
@@ -39,14 +42,13 @@ public class ReservationService {
                     reservation.setFlights(updatedReservation.getFlights());
                     return iReservationRepository.save(reservation);
                 })
-                .orElseThrow(() -> new RuntimeException("Reservation not found with id " + id));
+                .orElseThrow(() -> new ReservationNotFoundException("Reservation not found with ID: " + id));
     }
 
     public void deleteReservation(Long id) {
-        if (iReservationRepository.existsById(id)) {
-            iReservationRepository.deleteById(id);
-        } else {
-            throw new RuntimeException("Reservation not found with id " + id);
+        if (!iReservationRepository.existsById(id)) {
+            throw new ReservationNotFoundException("Reservation not found with ID: " + id);
         }
+        iReservationRepository.deleteById(id);
     }
 }
