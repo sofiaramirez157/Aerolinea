@@ -13,6 +13,7 @@ import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.context.annotation.Import;
 import org.springframework.test.web.servlet.MvcResult;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
 
@@ -23,6 +24,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 @AutoConfigureMockMvc
 @ActiveProfiles("test")
 @Import(TestSecurityConfig.class)
+@Transactional
 public class ReservationControllerIntegrationTest {
 
     @Autowired
@@ -79,7 +81,6 @@ public class ReservationControllerIntegrationTest {
     @Test
     void updateReservationTest() throws Exception {
         String reservationJson = objectMapper.writeValueAsString(testReservation);
-
         MvcResult result = mockMvc.perform(post("/api/reservations")
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(reservationJson))
@@ -102,8 +103,10 @@ public class ReservationControllerIntegrationTest {
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(updatedReservationJson))
                 .andExpect(status().isOk())
+                .andExpect(jsonPath("$.id").value(reservationId))
                 .andExpect(jsonPath("$.status").value(false));
     }
+
 
 
 
@@ -111,13 +114,19 @@ public class ReservationControllerIntegrationTest {
     @Test
     void deleteReservationTest() throws Exception {
         String reservationJson = objectMapper.writeValueAsString(testReservation);
-        mockMvc.perform(post("/api/reservations")
+        MvcResult result = mockMvc.perform(post("/api/reservations")
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(reservationJson))
-                .andExpect(status().isOk());
+                .andExpect(status().isOk())
+                .andReturn();
 
-        mockMvc.perform(delete("/api/reservations/1")
+        String responseBody = result.getResponse().getContentAsString();
+        Reservation createdReservation = objectMapper.readValue(responseBody, Reservation.class);
+        Long reservationId = createdReservation.getId();
+
+        mockMvc.perform(delete("/api/reservations/" + reservationId)
                         .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isNoContent());
     }
+
 }
