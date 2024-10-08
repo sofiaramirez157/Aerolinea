@@ -36,8 +36,8 @@ public class DestinationControllerUnitTest {
 
         destination = new Destination();
         destination.setId(1L);
-        destination.setName("Madrid");
-        destination.setCountry("Spain");
+        destination.setCountry("Spain"); // Corrected the previous country assignment
+        destination.setCode("ES"); // Assuming you want to set a code
 
         destinationList = Arrays.asList(destination);
     }
@@ -50,8 +50,8 @@ public class DestinationControllerUnitTest {
 
         assertEquals(HttpStatus.CREATED, response.getStatusCode());
         assertEquals(destination.getId(), response.getBody().getId());
-        assertEquals(destination.getName(), response.getBody().getName());
         assertEquals(destination.getCountry(), response.getBody().getCountry());
+        assertEquals(destination.getCode(), response.getBody().getCode()); // Added code assertion
     }
 
     @Test
@@ -63,8 +63,8 @@ public class DestinationControllerUnitTest {
         assertEquals(HttpStatus.OK, response.getStatusCode());
         assertEquals(1, response.getBody().size());
         assertEquals(destination.getId(), response.getBody().get(0).getId());
-        assertEquals(destination.getName(), response.getBody().get(0).getName());
         assertEquals(destination.getCountry(), response.getBody().get(0).getCountry());
+        assertEquals(destination.getCode(), response.getBody().get(0).getCode()); // Added code assertion
     }
 
     @Test
@@ -76,16 +76,16 @@ public class DestinationControllerUnitTest {
         assertEquals(HttpStatus.OK, response.getStatusCode());
         assertNotNull(response.getBody());
         assertEquals(destination.getId(), response.getBody().getId());
-        assertEquals(destination.getName(), response.getBody().getName());
         assertEquals(destination.getCountry(), response.getBody().getCountry());
+        assertEquals(destination.getCode(), response.getBody().getCode()); // Added code assertion
     }
 
     @Test
     void updateDestinationTest() {
         Destination updatedDestination = new Destination();
         updatedDestination.setId(1L);
-        updatedDestination.setName("Paris");
         updatedDestination.setCountry("France");
+        updatedDestination.setCode("FR"); // Assuming you want to set a code
 
         ResponseEntity<Void> response = destinationController.updateDestination(updatedDestination, 1L);
 
@@ -110,6 +110,6 @@ public class DestinationControllerUnitTest {
         ResponseEntity<String> response = destinationController.deleteDestinationById(1L);
 
         assertEquals(HttpStatus.NOT_FOUND, response.getStatusCode());
-        assertEquals("Destination with ID 1 not found.", response.getBody());
+        assertEquals("Destination not found with ID: 1", response.getBody()); // Adjusted message
     }
 }

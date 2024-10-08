@@ -33,8 +33,8 @@ public class DestinationServiceUnitTest {
         MockitoAnnotations.openMocks(this);
         destination = new Destination();
         destination.setId(1L);
-        destination.setName("Paris");
         destination.setCountry("France");
+        destination.setCode("FR"); // Added code field
     }
 
     @Test
@@ -45,8 +45,8 @@ public class DestinationServiceUnitTest {
 
         assertNotNull(createdDestination);
         assertEquals(destination.getId(), createdDestination.getId());
-        assertEquals(destination.getName(), createdDestination.getName());
         assertEquals(destination.getCountry(), createdDestination.getCountry());
+        assertEquals(destination.getCode(), createdDestination.getCode()); // Added code assertion
     }
 
     @Test
@@ -71,6 +71,8 @@ public class DestinationServiceUnitTest {
 
         assertNotNull(foundDestination);
         assertEquals(destination.getId(), foundDestination.getId());
+        assertEquals(destination.getCountry(), foundDestination.getCountry()); // Added assertion for country
+        assertEquals(destination.getCode(), foundDestination.getCode()); // Added assertion for code
     }
 
     @Test
@@ -80,8 +82,8 @@ public class DestinationServiceUnitTest {
 
         Destination updatedDestination = new Destination();
         updatedDestination.setId(1L);
-        updatedDestination.setName("New Paris");
-        updatedDestination.setCountry("France");
+        updatedDestination.setCountry("Spain"); // Updated country
+        updatedDestination.setCode("ES"); // Added code
 
         when(iDestinationRepository.save(any(Destination.class))).thenReturn(updatedDestination);
 
@@ -89,21 +91,21 @@ public class DestinationServiceUnitTest {
 
         verify(iDestinationRepository).save(argThat(savedDestination ->
                 savedDestination.getId() == 1L &&
-                        "New Paris".equals(savedDestination.getName()) &&
-                        "France".equals(savedDestination.getCountry())
+                        "Spain".equals(savedDestination.getCountry()) && // Updated assertion for country
+                        "ES".equals(savedDestination.getCode()) // Added assertion for code
         ));
 
         assertNotNull(result);
-        assertEquals("New Paris", result.getName());
-        assertEquals("France", result.getCountry());
+        assertEquals("Spain", result.getCountry()); // Updated assertion for country
+        assertEquals("ES", result.getCode()); // Added assertion for code
     }
 
     @Test
     void updateDestinationNotFoundTest() {
         Destination updatedDestination = new Destination();
         updatedDestination.setId(2L);
-        updatedDestination.setName("Non-existing");
         updatedDestination.setCountry("Nowhere");
+        updatedDestination.setCode("NW"); // Added code
 
         when(iDestinationRepository.existsById(2L)).thenReturn(false);
 

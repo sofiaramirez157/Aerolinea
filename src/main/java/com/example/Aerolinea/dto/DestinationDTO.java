@@ -9,6 +9,6 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 public class DestinationDTO {
     private Long id;
-    private String name;
     private String country;
+    private String code;
 }

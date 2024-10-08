@@ -30,15 +30,16 @@ public class DestinationServiceIntegrationTest {
     @BeforeEach
     public void setUp() {
         MockitoAnnotations.openMocks(this);
+
         destination1 = new Destination();
         destination1.setId(1);
-        destination1.setName("Paris");
         destination1.setCountry("France");
+        destination1.setCode("FR"); // Added code field
 
         destination2 = new Destination();
         destination2.setId(2);
-        destination2.setName("Madrid");
         destination2.setCountry("Spain");
+        destination2.setCode("ES"); // Added code field
     }
 
     @Test
@@ -48,8 +49,8 @@ public class DestinationServiceIntegrationTest {
 
         assertNotNull(newDestination);
         assertEquals(2, newDestination.getId());
-        assertEquals("Madrid", newDestination.getName());
         assertEquals("Spain", newDestination.getCountry());
+        assertEquals("ES", newDestination.getCode()); // Added code assertion
 
         verify(iDestinationRepository, times(1)).save(destination2);
     }
@@ -79,8 +80,8 @@ public class DestinationServiceIntegrationTest {
         Destination foundDestination = destinationService.getDestinationById(1);
 
         assertNotNull(foundDestination);
-        assertEquals("Paris", foundDestination.getName());
-        assertEquals("France", foundDestination.getCountry());
+        assertEquals("France", foundDestination.getCountry()); // Updated assertion
+        assertEquals("FR", foundDestination.getCode()); // Added code assertion
     }
 
     @Test
@@ -89,16 +90,16 @@ public class DestinationServiceIntegrationTest {
         when(iDestinationRepository.findById(1L)).thenReturn(Optional.of(destination1));
 
         Destination updatedDestination = new Destination();
-        updatedDestination.setName("Madrid");
         updatedDestination.setCountry("Spain");
+        updatedDestination.setCode("ES"); // Assuming you want to set a code
 
         when(iDestinationRepository.save(any(Destination.class))).thenAnswer(invocation -> invocation.getArgument(0));
 
         Destination result = destinationService.updateDestination(updatedDestination, 1L);
 
         assertNotNull(result);
-        assertEquals("Madrid", result.getName());
-        assertEquals("Spain", result.getCountry());
+        assertEquals("Spain", result.getCountry()); // Updated assertion
+        assertEquals("ES", result.getCode()); // Added code assertion
 
         verify(iDestinationRepository).existsById(1L);
         verify(iDestinationRepository).findById(1L);

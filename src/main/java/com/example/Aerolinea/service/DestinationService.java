@@ -17,7 +17,8 @@ public class DestinationService {
     }
 
     public Destination createDestination(Destination destination) {
-        if (destination == null || destination.getName() == null || destination.getCountry() == null) {
+        // Validate that destination and required fields are not null
+        if (destination == null || destination.getCountry() == null || destination.getCode() == null) {
             throw new InvalidRequestException("Invalid destination data provided.");
         }
         return iDestinationRepository.save(destination);
@@ -33,24 +34,27 @@ public class DestinationService {
     }
 
     public Destination updateDestination(Destination destination, long id) {
+        // Check if the destination exists
         if (!iDestinationRepository.existsById(id)) {
             throw new DestinationNotFoundException("Destination not found with ID: " + id);
         }
-        
+
         Destination existingDestination = iDestinationRepository.findById(id)
                 .orElseThrow(() -> new DestinationNotFoundException("Destination not found with ID: " + id));
 
-        if (destination.getName() != null) {
-            existingDestination.setName(destination.getName());
-        }
+        // Update only the fields that are not null
         if (destination.getCountry() != null) {
             existingDestination.setCountry(destination.getCountry());
+        }
+        if (destination.getCode() != null) {
+            existingDestination.setCode(destination.getCode());
         }
 
         return iDestinationRepository.save(existingDestination);
     }
 
     public boolean deleteDestination(long id) {
+        // Check if the destination exists
         if (!iDestinationRepository.existsById(id)) {
             throw new DestinationNotFoundException("Destination not found with ID: " + id);
         }

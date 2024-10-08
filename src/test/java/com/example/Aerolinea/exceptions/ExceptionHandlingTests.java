@@ -2,7 +2,6 @@ package com.example.Aerolinea.exceptions;
 
 import static org.junit.jupiter.api.Assertions.*;
 
-import com.example.Aerolinea.exceptions.*;
 import com.example.Aerolinea.exceptions.GlobalExceptionHandler;
 import com.example.Aerolinea.exceptions.ErrorResponse;
 import org.junit.jupiter.api.BeforeEach;

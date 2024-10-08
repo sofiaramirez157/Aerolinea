@@ -42,13 +42,13 @@ public class DestinationControllerIntegrationTest {
 
         destination1 = new Destination();
         destination1.setId(1L);
-        destination1.setName("Paris");
         destination1.setCountry("France");
+        destination1.setCode("FR"); // Assuming you want to set a code
 
         destination2 = new Destination();
         destination2.setId(2L);
-        destination2.setName("Tokyo");
         destination2.setCountry("Japan");
+        destination2.setCode("JP"); // Assuming you want to set a code
     }
 
     @Test
@@ -63,8 +63,8 @@ public class DestinationControllerIntegrationTest {
                         .content(destinationJson))
                 .andExpect(status().isCreated())
                 .andExpect(jsonPath("$.id").value(1))
-                .andExpect(jsonPath("$.name").value("Paris"))
-                .andExpect(jsonPath("$.country").value("France"));
+                .andExpect(jsonPath("$.country").value("France")) // Updated to check country
+                .andExpect(jsonPath("$.code").value("FR")); // Check code
     }
 
     @Test
@@ -79,8 +79,10 @@ public class DestinationControllerIntegrationTest {
                 .andExpect(content().contentType(MediaType.APPLICATION_JSON))
                 .andExpect(jsonPath("$").isArray())
                 .andExpect(jsonPath("$.length()").value(2))
-                .andExpect(jsonPath("$[0].name").value("Paris"))
-                .andExpect(jsonPath("$[1].name").value("Tokyo"));
+                .andExpect(jsonPath("$[0].country").value("France")) // Updated to check country
+                .andExpect(jsonPath("$[1].country").value("Japan")) // Updated to check country
+                .andExpect(jsonPath("$[0].code").value("FR")) // Check code
+                .andExpect(jsonPath("$[1].code").value("JP")); // Check code
     }
 
     @Test
@@ -91,7 +93,8 @@ public class DestinationControllerIntegrationTest {
                         .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.id").value(1))
-                .andExpect(jsonPath("$.name").value("Paris"));
+                .andExpect(jsonPath("$.country").value("France")) // Updated to check country
+                .andExpect(jsonPath("$.code").value("FR")); // Check code
     }
 
     @Test
