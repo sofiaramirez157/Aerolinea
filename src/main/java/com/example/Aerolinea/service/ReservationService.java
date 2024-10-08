@@ -11,42 +11,32 @@ import java.util.Optional;
 @Service
 public class ReservationService {
 
-    private final IReservationRepository iReservationRepository;
-
     @Autowired
-    public ReservationService(IReservationRepository iReservationRepository) {
-        this.iReservationRepository = iReservationRepository;
-    }
+    IReservationRepository iReservationRepository;
 
     public Reservation createReservation(Reservation reservation) {
         return iReservationRepository.save(reservation);
     }
 
-    public List<Reservation> getAllReservations() {
-        return iReservationRepository.findAll();
-    }
+    public List<Reservation> getAllReservation(){
+            return iReservationRepository.findAll();
+        }
 
     public Optional<Reservation> getReservationById(Long id) {
         return iReservationRepository.findById(id);
     }
 
-    public Reservation updateReservation(Long id, Reservation updatedReservation) {
-        return iReservationRepository.findById(id)
-                .map(reservation -> {
-                    reservation.setUser(updatedReservation.getUser());
-                    reservation.setReservationDate(updatedReservation.getReservationDate());
-                    reservation.setStatus(updatedReservation.isStatus());
-                    reservation.setFlights(updatedReservation.getFlights());
-                    return iReservationRepository.save(reservation);
-                })
-                .orElseThrow(() -> new RuntimeException("Reservation not found with id " + id));
+    public Reservation updateReservation(Reservation reservation, long id){
+        reservation.setId(id);
+        return iReservationRepository.save(reservation);
     }
 
-    public void deleteReservation(Long id) {
-        if (iReservationRepository.existsById(id)) {
+    public boolean deleteReservation(long id){
+        try {
             iReservationRepository.deleteById(id);
-        } else {
-            throw new RuntimeException("Reservation not found with id " + id);
+            return true;
+        } catch (Exception e){
+            return false;
         }
     }
 }
