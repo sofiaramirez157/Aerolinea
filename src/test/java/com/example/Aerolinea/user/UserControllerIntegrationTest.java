@@ -1,6 +1,7 @@
 package com.example.Aerolinea.user;
 
 import com.example.Aerolinea.controller.UserController;
+import com.example.Aerolinea.dto.UserDTO;
 import com.example.Aerolinea.model.ERole;
 import com.example.Aerolinea.model.User;
 import com.example.Aerolinea.service.UserService;
@@ -53,10 +54,11 @@ public class UserControllerIntegrationTest {
 
     @Test
     public void createUser() throws Exception {
+        UserDTO userDTO = new UserDTO(user1.getId(), user1.getUsername(), user1.getRole());
         when(userService.createUser(any(User.class))).thenReturn(user1);
 
         ObjectMapper objectMapper = new ObjectMapper();
-        String userJson = objectMapper.writeValueAsString(user1);
+        String userJson = objectMapper.writeValueAsString(userDTO);
 
         mockMvc.perform(post("/api/user/")
                         .contentType(MediaType.APPLICATION_JSON)
@@ -64,7 +66,7 @@ public class UserControllerIntegrationTest {
                 .andExpect(status().isCreated())
                 .andExpect(jsonPath("$.id").value(1))
                 .andExpect(jsonPath("$.username").value("Sofia"))
-                .andExpect(jsonPath("$.password").value("Conejitos"));
+                .andExpect(jsonPath("$.role").value("USER"));
     }
 
     @Test
@@ -90,15 +92,17 @@ public class UserControllerIntegrationTest {
         mockMvc.perform(get("/api/user/2")
                         .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$.id").value(2));
+                .andExpect(jsonPath("$.id").value(2))
+                .andExpect(jsonPath("$.username").value("Isabel"));
     }
 
     @Test
     public void updateUser() throws Exception {
+        UserDTO userDTO = new UserDTO(user1.getId(), user1.getUsername(), user1.getRole());
         when(userService.updateUser(any(User.class), any(Long.class))).thenReturn(user1);
 
         ObjectMapper objectMapper = new ObjectMapper();
-        String userJson = objectMapper.writeValueAsString(user1);
+        String userJson = objectMapper.writeValueAsString(userDTO);
 
         mockMvc.perform(put("/api/user/1")
                         .contentType(MediaType.APPLICATION_JSON)

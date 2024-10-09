@@ -1,5 +1,6 @@
 package com.example.Aerolinea.controller;
 
+import com.example.Aerolinea.dto.UserDTO;
 import com.example.Aerolinea.exceptions.UserNotFoundException;
 import com.example.Aerolinea.model.User;
 import com.example.Aerolinea.service.UserService;
@@ -38,7 +39,8 @@ public class UserController {
     }
 
     @PutMapping("/{id}")
-    public ResponseEntity<Void> updateUser(@RequestBody User user, @PathVariable long id) {
+    public ResponseEntity<Void> updateUser(@RequestBody UserDTO userDTO, @PathVariable long id) {
+        User user = UserDTO.toUser(userDTO);
         userService.updateUser(user, id);
         return new ResponseEntity<>(HttpStatus.NO_CONTENT);
     }

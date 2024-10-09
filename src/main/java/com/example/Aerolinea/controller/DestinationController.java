@@ -1,6 +1,5 @@
 package com.example.Aerolinea.controller;
 
-import com.example.Aerolinea.exceptions.DestinationNotFoundException;
 import com.example.Aerolinea.model.Destination;
 import com.example.Aerolinea.service.DestinationService;
 import org.springframework.http.HttpStatus;
@@ -45,12 +44,8 @@ public class DestinationController {
 
     @DeleteMapping("/{id}")
     public ResponseEntity<String> deleteDestinationById(@PathVariable long id) {
-        try {
-            if (destinationService.deleteDestination(id)) {
-                return new ResponseEntity<>("Destination with ID " + id + " was deleted.", HttpStatus.OK);
-            }
-        } catch (DestinationNotFoundException ex) {
-            throw ex;
+        if (destinationService.deleteDestination(id)) {
+            return new ResponseEntity<>("Destination with ID " + id + " was deleted.", HttpStatus.OK);
         }
         return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
     }

@@ -1,6 +1,7 @@
 package com.example.Aerolinea.user;
 
 import com.example.Aerolinea.controller.UserController;
+import com.example.Aerolinea.dto.UserDTO;
 import com.example.Aerolinea.model.User;
 import com.example.Aerolinea.service.UserService;
 import com.example.Aerolinea.exceptions.UserNotFoundException;
@@ -82,12 +83,13 @@ public class UserControllerUnitTest {
 
     @Test
     void updateUserTest() {
-        when(userService.updateUser(any(User.class), any(Long.class))).thenReturn(null);
+        UserDTO userDTO = new UserDTO(user.getId(), user.getUsername(), user.getRole());
+        when(userService.updateUser(any(User.class), any(Long.class))).thenReturn(user);
 
-        ResponseEntity<Void> response = userController.updateUser(user, 1L);
+        ResponseEntity<Void> response = userController.updateUser(userDTO, 1L);
 
         assertEquals(HttpStatus.NO_CONTENT, response.getStatusCode());
-        verify(userService).updateUser(user, 1L);
+        verify(userService).updateUser(any(User.class), any(Long.class));
     }
 
     @Test
