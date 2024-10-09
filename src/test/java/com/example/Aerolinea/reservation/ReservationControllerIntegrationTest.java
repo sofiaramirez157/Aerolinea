@@ -13,7 +13,6 @@ import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.context.annotation.Import;
 import org.springframework.test.web.servlet.MvcResult;
-import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
 
@@ -24,7 +23,6 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 @AutoConfigureMockMvc
 @ActiveProfiles("test")
 @Import(TestSecurityConfig.class)
-@Transactional
 public class ReservationControllerIntegrationTest {
 
     @Autowired
@@ -40,7 +38,7 @@ public class ReservationControllerIntegrationTest {
         testReservation = new Reservation();
         testReservation.setReservationDate(LocalDateTime.now());
         testReservation.setStatus(true);
-        testReservation.setUser(null);  // Cambiar esto cuando se mergee a dev!!!
+        testReservation.setUser(null);  // Placeholder, adjust based on your user model.
     }
 
     @Test
@@ -50,7 +48,7 @@ public class ReservationControllerIntegrationTest {
         mockMvc.perform(post("/api/reservations")
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(reservationJson))
-                .andExpect(status().isOk())
+                .andExpect(status().isCreated())  // Change to isCreated for successful POST
                 .andExpect(jsonPath("$.id").isNumber())
                 .andExpect(jsonPath("$.status").value(true));
     }
@@ -67,24 +65,10 @@ public class ReservationControllerIntegrationTest {
     @Test
     void getReservationByIdTest() throws Exception {
         String reservationJson = objectMapper.writeValueAsString(testReservation);
-        mockMvc.perform(post("/api/reservations")
-                        .contentType(MediaType.APPLICATION_JSON)
-                        .content(reservationJson))
-                .andExpect(status().isOk());
-
-        mockMvc.perform(get("/api/reservations/1")
-                        .contentType(MediaType.APPLICATION_JSON))
-                .andExpect(status().isOk())
-                .andExpect(jsonPath("$.id").value(1));
-    }
-
-    @Test
-    void updateReservationTest() throws Exception {
-        String reservationJson = objectMapper.writeValueAsString(testReservation);
         MvcResult result = mockMvc.perform(post("/api/reservations")
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(reservationJson))
-                .andExpect(status().isOk())
+                .andExpect(status().isCreated())  // Change to isCreated for successful POST
                 .andReturn();
 
         String responseBody = result.getResponse().getContentAsString();
@@ -95,8 +79,23 @@ public class ReservationControllerIntegrationTest {
                         .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.id").value(reservationId));
+    }
 
-        testReservation.setStatus(false);
+    @Test
+    void updateReservationTest() throws Exception {
+        String reservationJson = objectMapper.writeValueAsString(testReservation);
+        MvcResult result = mockMvc.perform(post("/api/reservations")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(reservationJson))
+                .andExpect(status().isCreated())  // Change to isCreated for successful POST
+                .andReturn();
+
+        String responseBody = result.getResponse().getContentAsString();
+        Reservation createdReservation = objectMapper.readValue(responseBody, Reservation.class);
+        Long reservationId = createdReservation.getId();
+
+        testReservation.setStatus(false);  // Update the status for testing
+
         String updatedReservationJson = objectMapper.writeValueAsString(testReservation);
 
         mockMvc.perform(put("/api/reservations/" + reservationId)
@@ -107,17 +106,13 @@ public class ReservationControllerIntegrationTest {
                 .andExpect(jsonPath("$.status").value(false));
     }
 
-
-
-
-
     @Test
     void deleteReservationTest() throws Exception {
         String reservationJson = objectMapper.writeValueAsString(testReservation);
         MvcResult result = mockMvc.perform(post("/api/reservations")
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(reservationJson))
-                .andExpect(status().isOk())
+                .andExpect(status().isCreated())  // Change to isCreated for successful POST
                 .andReturn();
 
         String responseBody = result.getResponse().getContentAsString();
@@ -128,5 +123,4 @@ public class ReservationControllerIntegrationTest {
                         .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isNoContent());
     }
-
 }
