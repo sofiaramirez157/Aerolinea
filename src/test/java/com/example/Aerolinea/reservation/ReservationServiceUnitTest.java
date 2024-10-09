@@ -1,6 +1,6 @@
 package com.example.Aerolinea.reservation;
 
-import com.example.Aerolinea.model.Reservation;
+import com.example.Aerolinea.model.*;
 import com.example.Aerolinea.repository.IReservationRepository;
 import com.example.Aerolinea.service.ReservationService;
 import org.junit.jupiter.api.BeforeEach;
@@ -10,7 +10,11 @@ import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
 
 import java.time.LocalDateTime;
+import java.time.LocalTime;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Optional;
+import java.util.Set;
 
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.any;
@@ -38,13 +42,40 @@ class ReservationServiceUnitTest {
 
     @Test
     void testCreateReservation() {
+        User user = new User();
+        user.setId(1L);
+        user.setUsername("testuser");
+        user.setEmail("testuser@example.com");
+        user.setPassword("password");
+        user.setRole(ERole.USER);
+
+        Destination destination = new Destination();
+        destination.setId(1L);
+        destination.setCountry("LAX");
+        destination.setCode("123456");
+
+        Flight flight = new Flight();
+        flight.setId(1L);
+        flight.setOrigin("NYC");
+        flight.setDestination(destination);
+        flight.setDepartureTime(LocalTime.of(10, 0));
+        flight.setArrivalTime(LocalTime.of(14, 0));
+        flight.setAvailableSeats(150);
+        flight.setStatus(true);
+
+        reservation.setUser(user);
+        reservation.getFlights().add(flight);
+
         when(reservationRepository.save(any(Reservation.class))).thenReturn(reservation);
 
         Reservation savedReservation = reservationService.createReservation(reservation);
 
         assertNotNull(savedReservation);
-        assertEquals(reservation.getId(), savedReservation.getId());
+        assertEquals(reservation.getReservationDate(), savedReservation.getReservationDate());
+        assertEquals(reservation.isStatus(), savedReservation.isStatus());
     }
+
+
 
     @Test
     void testGetReservationById() {
