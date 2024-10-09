@@ -1,56 +1,84 @@
 package com.example.Aerolinea.service;
 
+import io.jsonwebtoken.Claims;
+import io.jsonwebtoken.ExpiredJwtException;
+import io.jsonwebtoken.Jwts;
+import io.jsonwebtoken.SignatureAlgorithm;
+import io.jsonwebtoken.security.Keys;
+import jakarta.annotation.PostConstruct;
 import lombok.RequiredArgsConstructor;
-import org.springframework.security.authentication.AuthenticationManager;
-import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.core.userdetails.UserDetails;
-import org.springframework.security.crypto.password.PasswordEncoder;
+import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.stereotype.Service;
 
-import com.example.Aerolinea.dto.request.LoginRequest;
-import com.example.Aerolinea.dto.request.RegisterRequest;
-import com.example.Aerolinea.dto.response.AuthResponse;
-import com.example.Aerolinea.model.User;
-import com.example.Aerolinea.repository.IUserRepository;
+import javax.crypto.SecretKey;
+import java.util.Date;
+import java.util.HashMap;
+import java.util.Map;
 
 @Service
 @RequiredArgsConstructor
-public class AuthService {
+public class JwtService {
 
-    private final JwtService jwtService;
-    private final IUserRepository iUserRepository;
-    private final PasswordEncoder passwordEncoder;
+    @Value("${jwt.secret}")
+    private String secretKey;
 
-    private final AuthenticationManager authenticationManager;
+    @Value("${jwt.expirationMs}")
+    private long expirationTime;
 
-    public AuthResponse login(LoginRequest login) {
-        authenticationManager.authenticate(new UsernamePasswordAuthenticationToken(login.getUsername(), login.getPassword()));
+    private SecretKey key;
+    private final UserDetailsService userDetailsService;
 
-        UserDetails user = iUserRepository.findByUsername(login.getUsername()).orElseThrow();
-
-        String token = jwtService.getTokenService(user);
-
-        return AuthResponse
-                .builder()
-                .token(token)
-                .build();
+    @PostConstruct
+    protected void init() {
+        this.key = Keys.hmacShaKeyFor(secretKey.getBytes());
     }
 
-    public AuthResponse register(RegisterRequest register) {
-        User user = User.builder()
-                .username(register.getUsername())
-                .email(register.getEmail())
-                .password(passwordEncoder.encode(register.getPassword()))
-                .role(register.getRole())
-                .build();
-
-        iUserRepository.save(user);
-
-        return AuthResponse
-                .builder()
-                .token(jwtService.getTokenService(user))
-                .role(register.getRole())
-                .build();
+    public String generateToken(UserDetails userDetails) {
+        Map<String, Object> claims = new HashMap<>();
+        return createToken(claims, userDetails.getUsername());
     }
 
+    private String createToken(Map<String, Object> claims, String subject) {
+        return Jwts.builder()
+                .setClaims(claims)
+                .setSubject(subject)
+                .setIssuedAt(new Date(System.currentTimeMillis()))
+                .setExpiration(new Date(System.currentTimeMillis() + expirationTime))
+                .signWith(key, SignatureAlgorithm.HS256)
+                .compact();
+    }
+
+    public boolean isTokenValid(String token, UserDetails userDetails) {
+        final String username = getUsernameFromToken(token);
+        return username != null && username.equals(userDetails.getUsername()) && !isTokenExpired(token);
+    }
+
+    public String getUsernameFromToken(String token) {
+        try {
+            return getClaimsFromToken(token).getSubject();
+        } catch (ExpiredJwtException e) {
+            return null;
+        } catch (Exception e) {
+            return null;
+        }
+    }
+
+    private Claims getClaimsFromToken(String token) {
+        return Jwts.parserBuilder()
+                .setSigningKey(key)
+                .build()
+                .parseClaimsJws(token)
+                .getBody();
+    }
+
+    private boolean isTokenExpired(String token) {
+        final Date expiration = getClaimsFromToken(token).getExpiration();
+        return expiration.before(new Date());
+    }
+
+    public UserDetails loadUserByUsername(String username) {
+        return userDetailsService.loadUserByUsername(username);
+    }
 }

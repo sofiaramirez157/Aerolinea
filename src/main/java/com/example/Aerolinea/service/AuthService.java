@@ -1,68 +1,64 @@
-package com.example.Aerolinea.jwt;
+package com.example.Aerolinea.service;
 
-import com.example.Aerolinea.service.JwtService;
-import jakarta.servlet.FilterChain;
-import jakarta.servlet.ServletException;
-import jakarta.servlet.http.HttpServletRequest;
-import jakarta.servlet.http.HttpServletResponse;
+import com.example.Aerolinea.dto.request.LoginRequest;
+import com.example.Aerolinea.dto.request.RegisterRequest;
+import com.example.Aerolinea.dto.response.AuthResponse;
+import com.example.Aerolinea.model.User;
+import com.example.Aerolinea.repository.IUserRepository;
 import lombok.RequiredArgsConstructor;
-import org.springframework.http.HttpHeaders;
+import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
-import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
-import org.springframework.security.web.authentication.WebAuthenticationDetailsSource;
-import org.springframework.stereotype.Component;
-import org.springframework.util.StringUtils;
-import org.springframework.web.filter.OncePerRequestFilter;
+import org.springframework.security.crypto.password.PasswordEncoder;
+import org.springframework.stereotype.Service;
 
-import java.io.IOException;
-
-@Component
+@Service
 @RequiredArgsConstructor
+public class AuthService {
 
-public class AuthTokenFilter  extends OncePerRequestFilter {
-
+    private final IUserRepository userRepository;
     private final JwtService jwtService;
+    private final AuthenticationManager authenticationManager;
     private final UserDetailsService userDetailsService;
+    private final PasswordEncoder passwordEncoder;
 
-    @Override
-    protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain)
-            throws ServletException, IOException {
+    public AuthResponse login(LoginRequest loginRequest) {
+        authenticationManager.authenticate(
+                new UsernamePasswordAuthenticationToken(loginRequest.getUsername(), loginRequest.getPassword())
+        );
 
-        final String token = getTokenFromRequest(request);
-        final String username;
+        UserDetails userDetails = userDetailsService.loadUserByUsername(loginRequest.getUsername());
+        String token = jwtService.generateToken(userDetails);
 
-        if (token == null) {
-            filterChain.doFilter(request, response);
-            return;
+        if (userDetails instanceof User user) {
+            return AuthResponse.builder()
+                    .token(token)
+                    .role(user.getRole())
+                    .build();
+        } else {
+            throw new RuntimeException("User not found");
         }
-
-        username = jwtService.getUsernameFromToken(token);
-
-        if (username != null && SecurityContextHolder.getContext().getAuthentication() == null) {
-            UserDetails userDetails = userDetailsService.loadUserByUsername(username);
-
-            if (jwtService.isTokenValid(token, userDetails)) {
-                UsernamePasswordAuthenticationToken authToken = new UsernamePasswordAuthenticationToken(
-                        userDetails,
-                        null,
-                        userDetails.getAuthorities());
-
-                authToken.setDetails(new WebAuthenticationDetailsSource().buildDetails(request));
-
-                SecurityContextHolder.getContext().setAuthentication(authToken);
-            }
-        }
-        filterChain.doFilter(request, response);
     }
 
-    private String getTokenFromRequest(HttpServletRequest request) {
-        final String authHeader = request.getHeader(HttpHeaders.AUTHORIZATION);
-
-        if (StringUtils.hasText(authHeader) && authHeader.startsWith("Bearer ")) {
-            return authHeader.substring(7);
+    public AuthResponse register(RegisterRequest registerRequest) {
+        if (userRepository.existsByUsername(registerRequest.getUsername())) {
+            throw new RuntimeException("Username already taken");
         }
-        return null;
+
+        User user = new User();
+        user.setUsername(registerRequest.getUsername());
+        user.setEmail(registerRequest.getEmail());
+        user.setPassword(passwordEncoder.encode(registerRequest.getPassword()));
+        user.setRole(registerRequest.getRole());
+
+        userRepository.save(user);
+
+        String token = jwtService.generateToken(userDetailsService.loadUserByUsername(registerRequest.getUsername()));
+
+        return AuthResponse.builder()
+                .token(token)
+                .role(user.getRole())
+                .build();
     }
 }

@@ -35,6 +35,8 @@ public class DestinationControllerIntegrationTest {
     private Destination destination1;
     private Destination destination2;
 
+    private ObjectMapper objectMapper = new ObjectMapper();
+
     @BeforeEach
     public void setUp() {
         MockitoAnnotations.openMocks(this);
@@ -55,7 +57,6 @@ public class DestinationControllerIntegrationTest {
     public void createDestination() throws Exception {
         when(destinationService.createDestination(any(Destination.class))).thenReturn(destination1);
 
-        ObjectMapper objectMapper = new ObjectMapper();
         String destinationJson = objectMapper.writeValueAsString(destination1);
 
         mockMvc.perform(post("/api/destination/")
@@ -101,7 +102,6 @@ public class DestinationControllerIntegrationTest {
     public void updateDestination() throws Exception {
         when(destinationService.updateDestination(any(Destination.class), any(Long.class))).thenReturn(destination1);
 
-        ObjectMapper objectMapper = new ObjectMapper();
         String destinationJson = objectMapper.writeValueAsString(destination1);
 
         mockMvc.perform(put("/api/destination/1")
