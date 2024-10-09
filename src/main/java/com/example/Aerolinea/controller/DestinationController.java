@@ -2,6 +2,7 @@ package com.example.Aerolinea.controller;
 
 import com.example.Aerolinea.model.Destination;
 import com.example.Aerolinea.service.DestinationService;
+import com.example.Aerolinea.exceptions.DestinationNotFoundException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -44,9 +45,13 @@ public class DestinationController {
 
     @DeleteMapping("/{id}")
     public ResponseEntity<String> deleteDestinationById(@PathVariable long id) {
-        if (destinationService.deleteDestination(id)) {
-            return new ResponseEntity<>("Destination with ID " + id + " was deleted.", HttpStatus.OK);
+        try {
+            if (destinationService.deleteDestination(id)) {
+                return new ResponseEntity<>("Destination with ID " + id + " was deleted.", HttpStatus.OK);
+            }
+            return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
+        } catch (DestinationNotFoundException ex) {
+            return new ResponseEntity<>(ex.getMessage(), HttpStatus.NOT_FOUND);
         }
-        return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
     }
 }

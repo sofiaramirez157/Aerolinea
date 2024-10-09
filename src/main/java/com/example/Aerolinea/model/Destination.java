@@ -11,7 +11,7 @@ import lombok.Setter;
 @NoArgsConstructor
 @Setter
 @Getter
-@Table(name = "Destination")
+@Table(name = "destination")
 public class Destination {
 
     @Id
