@@ -1,6 +1,6 @@
 package com.example.Aerolinea.reservation;
 
-import com.example.Aerolinea.model.Reservation;
+import com.example.Aerolinea.model.*;
 import com.example.Aerolinea.testConfig.TestSecurityConfig;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.junit.jupiter.api.BeforeEach;
@@ -15,12 +15,15 @@ import org.springframework.context.annotation.Import;
 import org.springframework.test.web.servlet.MvcResult;
 
 import java.time.LocalDateTime;
+import java.time.LocalTime;
+import java.util.HashSet;
+import java.util.Set;
 
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
 @SpringBootTest
-@AutoConfigureMockMvc
+@AutoConfigureMockMvc(addFilters = false)
 @ActiveProfiles("test")
 @Import(TestSecurityConfig.class)
 public class ReservationControllerIntegrationTest {
@@ -35,10 +38,28 @@ public class ReservationControllerIntegrationTest {
 
     @BeforeEach
     void setUp() {
+        User user = new User();
+        user.setId(1L);
+        user.setUsername("Norbert");
+        user.setEmail("example@example.example");
+        user.setRole(ERole.USER);
+
+        Flight flight = new Flight();
+        flight.setId(1L);
+        flight.setOrigin("Brasil");
+        flight.setDestination(destination);
+        flight.setDepartureTime(LocalTime.now());
+        flight.setArrivalTime(LocalTime.NOON);
+        flight.setAvailableSeats(1);
+        flight.setStatus(true);
+        Set<Flight> flights = new HashSet<>();
+        flights.add(flight);
+
         testReservation = new Reservation();
         testReservation.setReservationDate(LocalDateTime.now());
         testReservation.setStatus(true);
-        testReservation.setUser(null);  // Placeholder, adjust based on your user model.
+        testReservation.setUser(user);
+        testReservation.setFlights(flights);
     }
 
     @Test
@@ -48,7 +69,7 @@ public class ReservationControllerIntegrationTest {
         mockMvc.perform(post("/api/reservations")
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(reservationJson))
-                .andExpect(status().isCreated())  // Change to isCreated for successful POST
+                .andExpect(status().isCreated())
                 .andExpect(jsonPath("$.id").isNumber())
                 .andExpect(jsonPath("$.status").value(true));
     }
@@ -68,7 +89,7 @@ public class ReservationControllerIntegrationTest {
         MvcResult result = mockMvc.perform(post("/api/reservations")
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(reservationJson))
-                .andExpect(status().isCreated())  // Change to isCreated for successful POST
+                .andExpect(status().isCreated())
                 .andReturn();
 
         String responseBody = result.getResponse().getContentAsString();
