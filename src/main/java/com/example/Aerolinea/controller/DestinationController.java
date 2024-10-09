@@ -7,7 +7,9 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 @RestController
 @RequestMapping("/api/destination")
@@ -44,14 +46,24 @@ public class DestinationController {
     }
 
     @DeleteMapping("/{id}")
-    public ResponseEntity<String> deleteDestinationById(@PathVariable long id) {
+    public ResponseEntity<Map<String, Object>> deleteDestinationById(@PathVariable long id) {
         try {
             if (destinationService.deleteDestination(id)) {
-                return new ResponseEntity<>("Destination with ID " + id + " was deleted.", HttpStatus.OK);
+                Map<String, Object> response = new HashMap<>();
+                response.put("message", "Destination with ID " + id + " was deleted.");
+                return ResponseEntity.ok(response);
             }
-            return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                    .body(Map.of("error", "Internal Server Error"));
         } catch (DestinationNotFoundException ex) {
-            return new ResponseEntity<>(ex.getMessage(), HttpStatus.NOT_FOUND);
+            Map<String, Object> response = new HashMap<>();
+            response.put("status", HttpStatus.NOT_FOUND.value());
+            response.put("message", ex.getMessage());
+            response.put("timestamp", System.currentTimeMillis());
+
+            return ResponseEntity
+                    .status(HttpStatus.NOT_FOUND)
+                    .body(response);
         }
     }
 }

@@ -1,3 +1,4 @@
+
 package com.example.Aerolinea.model;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;

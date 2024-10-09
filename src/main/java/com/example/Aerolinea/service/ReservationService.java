@@ -1,3 +1,4 @@
+
 package com.example.Aerolinea.service;
 
 import com.example.Aerolinea.exceptions.InvalidRequestException;
@@ -19,7 +20,7 @@ public class ReservationService {
     }
 
     public Reservation createReservation(Reservation reservation) {
-        if (reservation == null || reservation.getUser() == null || reservation.getFlights() == null) {
+        if (reservation == null || reservation.getUser() == null || reservation.getFlights().isEmpty()) {
             throw new InvalidRequestException("Invalid reservation data provided.");
         }
         return iReservationRepository.save(reservation);

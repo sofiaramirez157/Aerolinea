@@ -1,8 +1,10 @@
+
 package com.example.Aerolinea.controller;
 
 import com.example.Aerolinea.exceptions.ReservationNotFoundException;
 import com.example.Aerolinea.model.Reservation;
 import com.example.Aerolinea.service.ReservationService;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -21,7 +23,7 @@ public class ReservationController {
     @PostMapping
     public ResponseEntity<Reservation> createReservation(@RequestBody Reservation reservation) {
         Reservation savedReservation = reservationService.createReservation(reservation);
-        return ResponseEntity.ok(savedReservation);
+        return ResponseEntity.status(HttpStatus.CREATED).body(savedReservation);
     }
 
     @GetMapping

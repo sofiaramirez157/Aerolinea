@@ -14,6 +14,7 @@ import org.springframework.http.ResponseEntity;
 
 import java.util.Collections;
 import java.util.List;
+import java.util.Map;
 
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.any;
@@ -78,9 +79,14 @@ public class DestinationControllerUnitTest {
 
         assertEquals(HttpStatus.OK, response.getStatusCode());
         assertNotNull(response.getBody());
-        assertEquals(destination.getId(), response.getBody().getId());
-        assertEquals(destination.getCountry(), response.getBody().getCountry());
-        assertEquals(destination.getCode(), response.getBody().getCode());
+
+        if (response.getBody() != null) {
+            assertEquals(destination.getId(), response.getBody().getId());
+            assertEquals(destination.getCountry(), response.getBody().getCountry());
+            assertEquals(destination.getCode(), response.getBody().getCode());
+        } else {
+            fail("Response body is null");
+        }
     }
 
     @Test
@@ -102,19 +108,28 @@ public class DestinationControllerUnitTest {
     void deleteDestinationByIdTest() {
         when(destinationService.deleteDestination(1L)).thenReturn(true);
 
-        ResponseEntity<String> response = destinationController.deleteDestinationById(1L);
+        ResponseEntity<Map<String, Object>> response = destinationController.deleteDestinationById(1L);
 
         assertEquals(HttpStatus.OK, response.getStatusCode());
-        assertEquals("Destination with ID 1 was deleted.", response.getBody());
+        assertNotNull(response.getBody());
+        assertEquals("Destination with ID 1 was deleted.", response.getBody().get("message"));
     }
 
     @Test
     void deleteDestinationNotFoundTest() {
         when(destinationService.deleteDestination(1L)).thenThrow(new DestinationNotFoundException("Destination not found with ID: 1"));
 
-        ResponseEntity<String> response = destinationController.deleteDestinationById(1L);
+        ResponseEntity<Map<String, Object>> response = destinationController.deleteDestinationById(1L);
 
         assertEquals(HttpStatus.NOT_FOUND, response.getStatusCode());
-        assertEquals("Destination not found with ID: 1", response.getBody());
+
+        Map<String, Object> jsonResponse = response.getBody();
+        assertNotNull(jsonResponse);
+
+        assertEquals(404, jsonResponse.get("status"));
+        assertEquals("Destination not found with ID: 1", jsonResponse.get("message"));
+
+        long timestamp = (long) jsonResponse.get("timestamp");
+        assertTrue(timestamp > 0);
     }
 }

@@ -18,6 +18,7 @@ import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.*;
 
 public class DestinationServiceIntegrationTest {
+
     @Mock
     private IDestinationRepository iDestinationRepository;
 
@@ -32,12 +33,12 @@ public class DestinationServiceIntegrationTest {
         MockitoAnnotations.openMocks(this);
 
         destination1 = new Destination();
-        destination1.setId(1);
+        destination1.setId(1L); // Changed from int to Long
         destination1.setCountry("France");
         destination1.setCode("FR");
 
         destination2 = new Destination();
-        destination2.setId(2);
+        destination2.setId(2L); // Changed from int to Long
         destination2.setCountry("Spain");
         destination2.setCode("ES");
     }
@@ -48,7 +49,7 @@ public class DestinationServiceIntegrationTest {
         Destination newDestination = destinationService.createDestination(destination2);
 
         assertNotNull(newDestination);
-        assertEquals(2, newDestination.getId());
+        assertEquals(2L, newDestination.getId()); // Changed from int to Long
         assertEquals("Spain", newDestination.getCountry());
         assertEquals("ES", newDestination.getCode());
 
@@ -75,9 +76,9 @@ public class DestinationServiceIntegrationTest {
 
     @Test
     void getDestinationByIdTest() {
-        when(iDestinationRepository.findById(1L)).thenReturn(Optional.of(destination1));
+        when(iDestinationRepository.findById(1L)).thenReturn(Optional.of(destination1)); // Changed to Long
 
-        Destination foundDestination = destinationService.getDestinationById(1);
+        Destination foundDestination = destinationService.getDestinationById(1L); // Changed to Long
 
         assertNotNull(foundDestination);
         assertEquals("France", foundDestination.getCountry());
@@ -95,7 +96,7 @@ public class DestinationServiceIntegrationTest {
 
         when(iDestinationRepository.save(any(Destination.class))).thenAnswer(invocation -> invocation.getArgument(0));
 
-        Destination result = destinationService.updateDestination(updatedDestination, 1L);
+        Destination result = destinationService.updateDestination(updatedDestination, 1L); // Changed to Long
 
         assertNotNull(result);
         assertEquals("Spain", result.getCountry());
@@ -108,7 +109,7 @@ public class DestinationServiceIntegrationTest {
 
     @Test
     void deleteDestination() {
-        long id = 2;
+        long id = 2L; // Changed to Long
         when(iDestinationRepository.existsById(id)).thenReturn(true);
 
         boolean result = destinationService.deleteDestination(id);

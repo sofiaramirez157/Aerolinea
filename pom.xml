@@ -19,11 +19,10 @@
 
 	<properties>
 		<java.version>17</java.version>
-		<jackson.version>2.14.2</jackson.version> <!-- Added Jackson version property -->
 	</properties>
 
 	<dependencies>
-		<!-- Spring Boot Dependencies -->
+		<!-- Spring Boot Starters -->
 		<dependency>
 			<groupId>org.springframework.boot</groupId>
 			<artifactId>spring-boot-starter-data-jpa</artifactId>
@@ -37,33 +36,27 @@
 			<artifactId>spring-boot-starter-web</artifactId>
 		</dependency>
 
-		<!-- MySQL Connector for database connectivity -->
+		<!-- MySQL Connector -->
 		<dependency>
 			<groupId>com.mysql</groupId>
 			<artifactId>mysql-connector-j</artifactId>
 			<scope>runtime</scope>
 		</dependency>
 
-		<!-- Lombok for simplifying code (optional) -->
+		<!-- Lombok for reducing boilerplate code -->
 		<dependency>
 			<groupId>org.projectlombok</groupId>
 			<artifactId>lombok</artifactId>
 			<optional>true</optional>
 		</dependency>
 
-		<!-- Jackson dependencies for JSON processing -->
-		<dependency>
-			<groupId>com.fasterxml.jackson.core</groupId>
-			<artifactId>jackson-databind</artifactId>
-			<version>${jackson.version}</version> <!-- Version 2.14.2 -->
-		</dependency>
+		<!-- Jackson Dependencies (Managed by Spring Boot) -->
 		<dependency>
 			<groupId>com.fasterxml.jackson.datatype</groupId>
 			<artifactId>jackson-datatype-jsr310</artifactId>
-			<version>${jackson.version}</version> <!-- Version 2.14.2 -->
 		</dependency>
 
-		<!-- JWT Dependencies -->
+		<!-- JWT Dependencies with specified versions -->
 		<dependency>
 			<groupId>io.jsonwebtoken</groupId>
 			<artifactId>jjwt-api</artifactId>
@@ -73,18 +66,26 @@
 			<groupId>io.jsonwebtoken</groupId>
 			<artifactId>jjwt-impl</artifactId>
 			<version>0.11.5</version>
+			<scope>runtime</scope>
 		</dependency>
 		<dependency>
 			<groupId>io.jsonwebtoken</groupId>
 			<artifactId>jjwt-jackson</artifactId>
 			<version>0.11.5</version>
+			<scope>runtime</scope>
 		</dependency>
 
-		<!-- Testing Dependencies -->
+		<!-- Spring Boot Testing Dependencies (JUnit 5, Mockito, etc.) -->
 		<dependency>
 			<groupId>org.springframework.boot</groupId>
 			<artifactId>spring-boot-starter-test</artifactId>
 			<scope>test</scope>
+			<exclusions>
+				<exclusion>
+					<groupId>org.junit.vintage</groupId>
+					<artifactId>junit-vintage-engine</artifactId>
+				</exclusion>
+			</exclusions>
 		</dependency>
 		<dependency>
 			<groupId>org.springframework.security</groupId>
@@ -92,7 +93,7 @@
 			<scope>test</scope>
 		</dependency>
 
-		<!-- Mockito for unit testing -->
+		<!-- Mockito for Mocking in Unit Tests -->
 		<dependency>
 			<groupId>org.mockito</groupId>
 			<artifactId>mockito-core</artifactId>
@@ -106,7 +107,7 @@
 			<scope>provided</scope>
 		</dependency>
 
-		<!-- Springdoc OpenAPI for API documentation -->
+		<!-- OpenAPI for API Documentation (Optional but recommended) -->
 		<dependency>
 			<groupId>org.springdoc</groupId>
 			<artifactId>springdoc-openapi-ui</artifactId>
@@ -120,15 +121,8 @@
 			<plugin>
 				<groupId>org.springframework.boot</groupId>
 				<artifactId>spring-boot-maven-plugin</artifactId>
-				<configuration>
-					<excludes>
-						<exclude>
-							<groupId>org.projectlombok</groupId>
-							<artifactId>lombok</artifactId>
-						</exclude>
-					</excludes>
-				</configuration>
 			</plugin>
+
 			<!-- Maven Compiler Plugin -->
 			<plugin>
 				<groupId>org.apache.maven.plugins</groupId>
@@ -141,5 +135,4 @@
 			</plugin>
 		</plugins>
 	</build>
-
 </project>

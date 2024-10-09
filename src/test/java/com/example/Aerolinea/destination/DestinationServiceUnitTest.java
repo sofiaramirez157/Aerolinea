@@ -109,9 +109,7 @@ public class DestinationServiceUnitTest {
 
         when(iDestinationRepository.existsById(2L)).thenReturn(false);
 
-        assertThrows(DestinationNotFoundException.class, () -> {
-            destinationService.updateDestination(updatedDestination, 2L);
-        });
+        assertThrows(DestinationNotFoundException.class, () -> destinationService.updateDestination(updatedDestination, 2L));
     }
 
     @Test
@@ -128,8 +126,6 @@ public class DestinationServiceUnitTest {
     void deleteDestinationNotFoundTest() {
         when(iDestinationRepository.existsById(destination.getId())).thenReturn(false);
 
-        assertThrows(DestinationNotFoundException.class, () -> {
-            destinationService.deleteDestination(destination.getId());
-        });
+        assertThrows(DestinationNotFoundException.class, () -> destinationService.deleteDestination(destination.getId()));
     }
 }

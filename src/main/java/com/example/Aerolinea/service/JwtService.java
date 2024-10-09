@@ -30,6 +30,7 @@ public class JwtService {
     private SecretKey key;
     private final UserDetailsService userDetailsService;
 
+    @SuppressWarnings("unused")
     @PostConstruct
     protected void init() {
         this.key = Keys.hmacShaKeyFor(secretKey.getBytes());
@@ -59,7 +60,7 @@ public class JwtService {
         try {
             return getClaimsFromToken(token).getSubject();
         } catch (ExpiredJwtException e) {
-            return null;
+            return null; // Handle token expiration
         } catch (Exception e) {
             return null;
         }

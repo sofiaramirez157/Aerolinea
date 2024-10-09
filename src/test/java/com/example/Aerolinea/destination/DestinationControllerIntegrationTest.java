@@ -35,7 +35,7 @@ public class DestinationControllerIntegrationTest {
     private Destination destination1;
     private Destination destination2;
 
-    private ObjectMapper objectMapper = new ObjectMapper();
+    private final ObjectMapper objectMapper = new ObjectMapper();
 
     @BeforeEach
     public void setUp() {
@@ -112,12 +112,14 @@ public class DestinationControllerIntegrationTest {
 
     @Test
     public void deleteDestination() throws Exception {
+        String expectedResponse = "{\"message\": \"Destination with ID 1 was deleted.\"}";
         when(destinationService.deleteDestination(1L)).thenReturn(true);
 
         mockMvc.perform(delete("/api/destination/1")
                         .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$").value("Destination with ID 1 was deleted."));
+                .andExpect(content().contentType(MediaType.APPLICATION_JSON))
+                .andExpect(content().json(expectedResponse));
     }
 
     @Test
