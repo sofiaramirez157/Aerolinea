@@ -38,15 +38,10 @@ public class ReservationControllerIntegrationTest {
 
     @BeforeEach
     void setUp() {
-        Destination destination = new Destination();
-        destination.setId(1L);
-        destination.setCountry("USA");
-        destination.setCode("US");
-
         User user = new User();
         user.setId(1L);
         user.setUsername("Norbert");
-        user.setEmail("example@example.com");
+        user.setEmail("example@example.example");
         user.setRole(ERole.USER);
 
         Flight flight = new Flight();
@@ -113,16 +108,16 @@ public class ReservationControllerIntegrationTest {
         MvcResult result = mockMvc.perform(post("/api/reservations")
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(reservationJson))
-                .andExpect(status().isCreated())
+                .andExpect(status().isCreated())  // Change to isCreated for successful POST
                 .andReturn();
 
         String responseBody = result.getResponse().getContentAsString();
         Reservation createdReservation = objectMapper.readValue(responseBody, Reservation.class);
         Long reservationId = createdReservation.getId();
 
-        createdReservation.setStatus(false);
+        testReservation.setStatus(false);  // Update the status for testing
 
-        String updatedReservationJson = objectMapper.writeValueAsString(createdReservation);
+        String updatedReservationJson = objectMapper.writeValueAsString(testReservation);
 
         mockMvc.perform(put("/api/reservations/" + reservationId)
                         .contentType(MediaType.APPLICATION_JSON)
@@ -138,7 +133,7 @@ public class ReservationControllerIntegrationTest {
         MvcResult result = mockMvc.perform(post("/api/reservations")
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(reservationJson))
-                .andExpect(status().isCreated())
+                .andExpect(status().isCreated())  // Change to isCreated for successful POST
                 .andReturn();
 
         String responseBody = result.getResponse().getContentAsString();
