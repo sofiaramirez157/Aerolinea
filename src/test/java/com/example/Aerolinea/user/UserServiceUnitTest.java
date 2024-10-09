@@ -35,7 +35,7 @@ public class UserServiceUnitTest {
         user.setId(1L);
         user.setUsername("Sofia");
         user.setPassword("perritos");
-        user.setRole(ERole.ROLE_USER);
+        user.setRole(ERole.USER);
     }
 
     @Test

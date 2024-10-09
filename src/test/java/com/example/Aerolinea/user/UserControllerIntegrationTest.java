@@ -42,13 +42,13 @@ public class UserControllerIntegrationTest {
         user1.setId(1L);
         user1.setUsername("Sofia");
         user1.setPassword("Conejitos");
-        user1.setRole(ERole.ROLE_USER);
+        user1.setRole(ERole.USER);
 
         user2 = new User();
         user2.setId(2L);
         user2.setUsername("Isabel");
         user2.setPassword("Perritos");
-        user2.setRole(ERole.ROLE_USER);
+        user2.setRole(ERole.USER);
     }
 
     @Test

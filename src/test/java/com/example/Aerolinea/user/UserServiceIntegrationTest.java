@@ -39,13 +39,13 @@ public class UserServiceIntegrationTest {
         user1.setId(1L);
         user1.setUsername("Sofia");
         user1.setPassword("perritos");
-        user1.setRole(ERole.ROLE_USER);
+        user1.setRole(ERole.USER);
 
         user2 = new User();
         user2.setId(2L);
         user2.setUsername("Isabel");
         user2.setPassword("conejitos");
-        user2.setRole(ERole.ROLE_USER);
+        user2.setRole(ERole.USER);
     }
 
     @Test
@@ -58,7 +58,7 @@ public class UserServiceIntegrationTest {
         assertEquals(2L, newUser.getId());
         assertEquals("Isabel", newUser.getUsername());
         assertEquals("conejitos", newUser.getPassword());
-        assertEquals(ERole.ROLE_USER, newUser.getRole());
+        assertEquals(ERole.USER, newUser.getRole());
 
         verify(iUserRepository, times(1)).save(any(User.class));
     }
@@ -100,7 +100,7 @@ public class UserServiceIntegrationTest {
         userToUpdate.setId(1L);
         userToUpdate.setUsername("Updated Sofia");
         userToUpdate.setPassword("perritos");
-        userToUpdate.setRole(ERole.ROLE_USER);
+        userToUpdate.setRole(ERole.USER);
 
         when(iUserRepository.save(any(User.class))).thenReturn(userToUpdate);
 
