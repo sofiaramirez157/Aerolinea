@@ -1,56 +1,76 @@
 package com.example.Aerolinea.service;
 
+import io.jsonwebtoken.Claims;
+import io.jsonwebtoken.Jwts;
+import io.jsonwebtoken.SignatureAlgorithm;
+import io.jsonwebtoken.io.Decoders;
+import io.jsonwebtoken.security.Keys;
 import lombok.RequiredArgsConstructor;
-import org.springframework.security.authentication.AuthenticationManager;
-import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.userdetails.UserDetails;
-import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
-import com.example.Aerolinea.dto.request.LoginRequest;
-import com.example.Aerolinea.dto.request.RegisterRequest;
-import com.example.Aerolinea.dto.response.AuthResponse;
-import com.example.Aerolinea.model.User;
-import com.example.Aerolinea.repository.IUserRepository;
+import java.security.Key;
+import java.util.Date;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.function.Function;
 
 @Service
 @RequiredArgsConstructor
-public class AuthService {
+public class JwtService {
 
-    private final JwtService jwtService;
-    private final IUserRepository iUserRepository;
-    private final PasswordEncoder passwordEncoder;
+    private static final String SECRET_KEY = "586E3272357538782F413F4428472B4B6250655368566B59703373367639792";
 
-    private final AuthenticationManager authenticationManager;
+    public String getTokenService(UserDetails user){
 
-    public AuthResponse login(LoginRequest login) {
-        authenticationManager.authenticate(new UsernamePasswordAuthenticationToken(login.getUsername(), login.getPassword()));
-
-        UserDetails user = iUserRepository.findByUsername(login.getUsername()).orElseThrow();
-
-        String token = jwtService.getTokenService(user);
-
-        return AuthResponse
-                .builder()
-                .token(token)
-                .build();
+        return getToken(new HashMap<>(),user);
     }
 
-    public AuthResponse register(RegisterRequest register) {
-        User user = User.builder()
-                .username(register.getUsername())
-                .email(register.getEmail())
-                .password(passwordEncoder.encode(register.getPassword()))
-                .role(register.getRole())
-                .build();
+    public String getToken(Map<String, Object> claims, UserDetails user){
 
-        iUserRepository.save(user);
-
-        return AuthResponse
+        return Jwts
                 .builder()
-                .token(jwtService.getTokenService(user))
-                .role(register.getRole())
-                .build();
+                .setClaims(claims)
+                .setSubject(user.getUsername())
+                .setIssuedAt(new Date(System.currentTimeMillis()))
+                .setExpiration(new Date(System.currentTimeMillis() + 1000 * 60 * 60 * 24))
+                .signWith(SignatureAlgorithm.HS256, getKey())
+                .compact();
     }
 
+    private Key getKey(){
+        byte[] keyBytes = Decoders.BASE64.decode(SECRET_KEY);
+        return Keys.hmacShaKeyFor(keyBytes);
+    }
+
+    public String getUsernameFromToken(String token) {
+
+        return getClaim(token, Claims::getSubject);
+    }
+
+    public <T> T getClaim(String token, Function<Claims, T> claimsResolver) {
+        final Claims claims = getAllClaims(token);
+        return claimsResolver.apply(claims);
+    }
+
+    private Claims getAllClaims(String token) {
+        return Jwts
+                .parser()
+                .setSigningKey(getKey())
+                .parseClaimsJws(token)
+                .getBody();
+    }
+
+    public boolean isTokenValid(String token, UserDetails userDetails) {
+        final String username = getUsernameFromToken(token);
+        return (username.equals(userDetails.getUsername()) && !isTokenExpired(token));
+    }
+
+    private boolean isTokenExpired(String token) {
+        return getExpiration(token).before(new Date());
+    }
+
+    private Date getExpiration(String token) {
+        return getClaim(token, Claims::getExpiration);
+    }
 }

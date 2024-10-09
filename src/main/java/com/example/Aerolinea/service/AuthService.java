@@ -1,68 +1,56 @@
-package com.example.Aerolinea.jwt;
+package com.example.Aerolinea.service;
 
-import com.example.Aerolinea.service.JwtService;
-import jakarta.servlet.FilterChain;
-import jakarta.servlet.ServletException;
-import jakarta.servlet.http.HttpServletRequest;
-import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
-import org.springframework.http.HttpHeaders;
+import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
-import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
-import org.springframework.security.core.userdetails.UserDetailsService;
-import org.springframework.security.web.authentication.WebAuthenticationDetailsSource;
-import org.springframework.stereotype.Component;
-import org.springframework.util.StringUtils;
-import org.springframework.web.filter.OncePerRequestFilter;
+import org.springframework.security.crypto.password.PasswordEncoder;
+import org.springframework.stereotype.Service;
 
-import java.io.IOException;
+import com.example.Aerolinea.dto.request.LoginRequest;
+import com.example.Aerolinea.dto.request.RegisterRequest;
+import com.example.Aerolinea.dto.response.AuthResponse;
+import com.example.Aerolinea.model.User;
+import com.example.Aerolinea.repository.IUserRepository;
 
-@Component
+@Service
 @RequiredArgsConstructor
-
-public class AuthTokenFilter  extends OncePerRequestFilter {
+public class AuthService {
 
     private final JwtService jwtService;
-    private final UserDetailsService userDetailsService;
+    private final IUserRepository iUserRepository;
+    private final PasswordEncoder passwordEncoder;
 
-    @Override
-    protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain)
-            throws ServletException, IOException {
+    private final AuthenticationManager authenticationManager;
 
-        final String token = getTokenFromRequest(request);
-        final String username;
+    public AuthResponse login(LoginRequest login) {
+        authenticationManager.authenticate(new UsernamePasswordAuthenticationToken(login.getUsername(), login.getPassword()));
 
-        if (token == null) {
-            filterChain.doFilter(request, response);
-            return;
-        }
+        UserDetails user = iUserRepository.findByUsername(login.getUsername()).orElseThrow();
 
-        username = jwtService.getUsernameFromToken(token);
+        String token = jwtService.getTokenService(user);
 
-        if (username != null && SecurityContextHolder.getContext().getAuthentication() == null) {
-            UserDetails userDetails = userDetailsService.loadUserByUsername(username);
-
-            if (jwtService.isTokenValid(token, userDetails)) {
-                UsernamePasswordAuthenticationToken authToken = new UsernamePasswordAuthenticationToken(
-                        userDetails,
-                        null,
-                        userDetails.getAuthorities());
-
-                authToken.setDetails(new WebAuthenticationDetailsSource().buildDetails(request));
-
-                SecurityContextHolder.getContext().setAuthentication(authToken);
-            }
-        }
-        filterChain.doFilter(request, response);
+        return AuthResponse
+                .builder()
+                .token(token)
+                .build();
     }
 
-    private String getTokenFromRequest(HttpServletRequest request) {
-        final String authHeader = request.getHeader(HttpHeaders.AUTHORIZATION);
+    public AuthResponse register(RegisterRequest register) {
+        User user = User.builder()
+                .username(register.getUsername())
+                .email(register.getEmail())
+                .password(passwordEncoder.encode(register.getPassword()))
+                .role(register.getRole())
+                .build();
 
-        if (StringUtils.hasText(authHeader) && authHeader.startsWith("Bearer ")) {
-            return authHeader.substring(7);
-        }
-        return null;
+        iUserRepository.save(user);
+
+        return AuthResponse
+                .builder()
+                .token(jwtService.getTokenService(user))
+                .role(register.getRole())
+                .build();
     }
+
 }
