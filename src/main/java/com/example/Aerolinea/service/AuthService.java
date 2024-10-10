@@ -1,5 +1,12 @@
 package com.example.Aerolinea.service;
 
+import lombok.RequiredArgsConstructor;
+import org.springframework.security.authentication.AuthenticationManager;
+import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.core.userdetails.UserDetails;
+import org.springframework.security.crypto.password.PasswordEncoder;
+import org.springframework.stereotype.Service;
+
 import com.example.Aerolinea.dto.request.LoginRequest;
 import com.example.Aerolinea.dto.request.RegisterRequest;
 import com.example.Aerolinea.dto.response.AuthResponse;
@@ -17,48 +24,40 @@ import org.springframework.stereotype.Service;
 @RequiredArgsConstructor
 public class AuthService {
 
-    private final IUserRepository userRepository;
     private final JwtService jwtService;
-    private final AuthenticationManager authenticationManager;
-    private final UserDetailsService userDetailsService;
+    private final IUserRepository iUserRepository;
     private final PasswordEncoder passwordEncoder;
 
-    public AuthResponse login(LoginRequest loginRequest) {
-        authenticationManager.authenticate(
-                new UsernamePasswordAuthenticationToken(loginRequest.getUsername(), loginRequest.getPassword())
-        );
+    private final AuthenticationManager authenticationManager;
 
-        UserDetails userDetails = userDetailsService.loadUserByUsername(loginRequest.getUsername());
-        String token = jwtService.generateToken(userDetails);
+    public AuthResponse login(LoginRequest login) {
+        authenticationManager.authenticate(new UsernamePasswordAuthenticationToken(login.getUsername(), login.getPassword()));
 
-        if (userDetails instanceof User user) {
-            return AuthResponse.builder()
-                    .token(token)
-                    .role(user.getRole())
-                    .build();
-        } else {
-            throw new RuntimeException("User not found");
-        }
-    }
+        UserDetails user = iUserRepository.findByUsername(login.getUsername()).orElseThrow();
 
-    public AuthResponse register(RegisterRequest registerRequest) {
-        if (userRepository.existsByUsername(registerRequest.getUsername())) {
-            throw new RuntimeException("Username already taken");
-        }
+        String token = jwtService.getTokenService(user);
 
-        User user = new User();
-        user.setUsername(registerRequest.getUsername());
-        user.setEmail(registerRequest.getEmail());
-        user.setPassword(passwordEncoder.encode(registerRequest.getPassword()));
-        user.setRole(registerRequest.getRole());
-
-        userRepository.save(user);
-
-        String token = jwtService.generateToken(userDetailsService.loadUserByUsername(registerRequest.getUsername()));
-
-        return AuthResponse.builder()
+        return AuthResponse
+                .builder()
                 .token(token)
-                .role(user.getRole())
                 .build();
     }
+
+    public AuthResponse register(RegisterRequest register) {
+        User user = User.builder()
+                .username(register.getUsername())
+                .email(register.getEmail())
+                .password(passwordEncoder.encode(register.getPassword()))
+                .role(register.getRole())
+                .build();
+
+        iUserRepository.save(user);
+
+        return AuthResponse
+                .builder()
+                .token(jwtService.getTokenService(user))
+                .role(register.getRole())
+                .build();
+    }
+
 }
