@@ -47,7 +47,7 @@ class ReservationControllerUnitTest {
 
         ResponseEntity<Reservation> response = reservationController.createReservation(reservation);
 
-        assertEquals(200, response.getStatusCodeValue());
+        assertEquals(201, response.getStatusCodeValue());
         assertEquals(reservation.getId(), response.getBody().getId());
     }
 

@@ -30,5 +30,6 @@ public class Reservation {
     @Column(name = "status")
     private boolean status;
     @ManyToOne
-    @JoinColumn(name = "flight_id") // Foreign key in the Reservation table
-    private Set<Flight> flights = new HashSet<>();}
+    @JoinColumn(name = "flight_id")
+    private Set<Flight> flights = new HashSet<>();
+}
